@@ -4,3 +4,7 @@
 [submodule "themes/hugo-natrium-theme"]
 	path = themes/hugo-natrium-theme
 	url = https://github.com/mobybit/hugo-natrium-theme.git
+[submodule "public"]
+	path = public
+	url = git@github.com:blogtitle/blogtitle.github.io.git
+	branch = master
