@@ -9,7 +9,7 @@ pygmentsCodefences = true
 pygmentsStyle = "native"
 
 [taxonomies]
-    category = "categories"  
+    category = "authors"  
     tag = "tags"
 
 [permalinks]
@@ -27,15 +27,15 @@ pygmentsStyle = "native"
     weight = -120
 
 [[menu.main]]
-    name = "Categories"
-    url = "/categories"
+    name = "Authors"
+    url = "/authors"
     weight = -130
 
 [params]
     description = ""
 
     [params.logo]
-    url = "logo.png"
+    url = "../../../gopher.png"
     width = 50
     height = 50
     alt = "Logo"
