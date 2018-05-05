@@ -1,7 +1,7 @@
 baseURL = "https://blogtitle.github.io/"
 languageCode = "en-us"
 title = "Blog Title"
-theme = "hugo-natrium-theme"
+theme = "hugo-natrium-multiple-authors-theme"
 preserveTaxonomyNames = true
 rssLimit = 10
 paginate = 10
@@ -9,8 +9,9 @@ pygmentsCodefences = true
 pygmentsStyle = "native"
 
 [taxonomies]
-    category = "authors"  
+    category = "categories"  
     tag = "tags"
+    author = "authors"
 
 [permalinks]
     post = "/:slug/"
@@ -27,15 +28,30 @@ pygmentsStyle = "native"
     weight = -120
 
 [[menu.main]]
+    name = "Categories"
+    url = "/categories"
+    weight = -130
+
+[[menu.main]]
     name = "Authors"
     url = "/authors"
-    weight = -130
+    weight = -140
 
 [params]
     description = ""
 
     [params.logo]
-    url = "gopher.png"
+    url = "clorine.png"
     width = 50
     height = 50
     alt = "Logo"
+
+    [params.authors.anna]
+    id = "anna"
+    firstName = "Anna"
+    lastName = "Bernardi"
+
+    [params.authors.rob]
+    id = "roberto"
+    firstName = "Roberto"
+    lastName = "Clapis"
