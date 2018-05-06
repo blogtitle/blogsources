@@ -5,7 +5,6 @@ slug: "first"
 categories: ["Theme trials"]
 tags: ["golang", "css"]
 authors: ["Anna"]
-draft: true
 ---
 Just a sentence with some code
 

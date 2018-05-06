@@ -5,7 +5,6 @@ slug: "second"
 categories: ["Theme trials"]
 tags: ["python", "css"]
 authors: ["Anna"]
-draft: true
 ---
 Just a sentence with some code
 

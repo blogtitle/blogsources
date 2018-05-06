@@ -1,7 +1,6 @@
 ---
 title: "Last"
 date: 2018-05-03T17:34:04-07:00
-draft: true
 slug: "last" 
 categories: ["Theme trials"] 
 authors: ["Roberto"]
