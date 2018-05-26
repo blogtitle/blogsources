@@ -4,3 +4,7 @@
 [submodule "themes/hugo-chlorine-theme"]
 	path = themes/hugo-chlorine-theme
 	url = https://github.com/AnnaOpss/hugo-chlorine-theme.git
+[submodule "public"]
+	path = public
+	url = git@github.com:blogtitle/blogtitle.github.io.git
+	branch = master
