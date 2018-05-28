@@ -4,7 +4,7 @@ date: 2018-05-25T21:35:39-07:00
 authors: ["Anna"]
 tags: ["Islands", "Scuba"]
 categories: ["Travels"]
-draft: true
+draft: false
 ---
 
 This last weekend I flew to Hawaii for the first time in my life. What. An. Experience. Before leaving I read a couple of travel guides online, but nothing prepared me for the beauty of this island.
