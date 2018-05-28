@@ -7,6 +7,7 @@ rssLimit = 10
 paginate = 10
 pygmentsCodefences = true
 pygmentsStyle = "native"
+googleAnalytics = "UA-119970190-1"
 
 [taxonomies]
     category = "categories"  
