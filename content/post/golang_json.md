@@ -132,4 +132,4 @@ It is also possible to nest struct for nested JSON.
 ```
 _[See this code in the playground.](https://play.golang.org/p/SdGfyaNId6V)_
 
-5. [{...},{...}],[{...},{...}]
+1. TODO: [{...},{...}],[{...},{...}]
