@@ -100,7 +100,7 @@ It is also possible to nest struct for nested JSON.
 ```JSON
     {"ok": true,
     "users":[
-	{"name": ["Alice","Charlie"], "role": "admin"},
+		{"name": ["Alice","Charlie"], "role": "admin"},
     	{"name": ["Bob","Denise"],    "role": "user"}
     ]}
 ```
