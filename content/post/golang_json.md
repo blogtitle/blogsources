@@ -2,14 +2,13 @@
 title: "Unmarshaling JSON in Golang"
 date: 2018-05-30T16:35:28-07:00
 categories: ["Golang"]
-tags: ["Parsing"]
+tags: ["Parsing", "JSON"]
 authors: ["Anna"]
-draft: true
 ---
 
-Unmarshaling JSON files in Golang can be tricky. Golang is a static language and does not allow dynamic JSON deserialization. In order to unmarshal a JSON blob into Golang it usually requires to know its structure beforehand. But, as the [internal documentation](https://golang.org/pkg/encoding/json/#Unmarshal) states, it is possible to unmarshal JSON into an empty interface.
+Unmarshaling JSON files in Golang can be tricky. Golang is a statically typed language and does not allow dynamic JSON deserialization. In order to unmarshal a JSON blob into Golang it usually requires to know its structure beforehand. But, as the [internal documentation](https://golang.org/pkg/encoding/json/#Unmarshal) states, it is possible to unmarshal JSON into an empty interface.
 
-An empty interface represents the empty set of methods and is satisfied by any value at all, since any value has zero or more methods. At run time the value stored in the empty interface variable may change type, but will always satisfy the interface.
+An empty interface represents the empty set of methods and is satisfied by any value, since any value has zero or more methods. At run time the value stored in the empty interface variable may change type, but will always satisfy the interface.
 
 The following post will provide a series of examples on how to unmarshal a JSON blob without specifying its entire structure in Golang.
 
@@ -175,4 +174,4 @@ The example above works only if all the elements in the name list are strings. I
 
 _[See this code in the playground.](https://play.golang.org/p/UT8HyEaa01q)_
 
-
+These are some examples I stumbled upon while using Go. The solution to not using a fixed struct to unmarshal a JSON is not always obvious, but in the end it can save up time and patience if the JSON you are receving changes over time.
