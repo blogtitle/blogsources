@@ -19,7 +19,7 @@ Let's start with an easy example: unmarshaling a list of JSON with a predefined 
     {"name": "Bob",    "role": "user"}]
 ```
 
-```Golang
+```go
 	type Users struct {
 		Name string `json:"Name"`
 		Role string `json:"Role"`
@@ -37,7 +37,7 @@ _[See this code in the playground.](https://play.golang.org/p/8lPmI6lmtQo)_
 
 If you don't want to specify the entire JSON structure in your code, it is possible to unmarshal it into a map from string to an empty interface and then cast its value later on. This can be useful if you can't rely on the JSON structure or if it is too long to create your own.
 
-```Golang
+```go
 	var users []map[string]interface{}
 
 	err := json.Unmarshal(jsonBlob, &users)
@@ -71,7 +71,7 @@ In order to unmarshal a list of JSON that are inside a JSON field, you can alway
     ]}
 ```
 
-```Golang
+```go
 	type jsonUsers struct {
 		Ok    bool `json:"ok"`
 		Users []map[string]interface{} `json:"users"`
@@ -108,7 +108,7 @@ Another interesting feature is the possibility to nest data structures and use t
     ]}
 ```
 
-```Golang
+```go
 	type dataUsers struct {
 		Name []string `json:"name"`
 		Role string   `json:"role"`
@@ -145,7 +145,7 @@ The example above works only if all the elements in the name list are strings. I
     ]}
 ```
 
-```Golang
+```go
 	type jsonUsers struct {
 		Ok    bool
 		Users []map[string]interface{} `json:"users"`
