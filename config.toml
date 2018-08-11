@@ -43,7 +43,7 @@ googleAnalytics = "UA-119970190-1"
     description = ""
 
     [params.logo]
-    url = "clorine.png"
+    url = "dotstar.png"
     width = 50
     height = 50
     alt = "Logo"
