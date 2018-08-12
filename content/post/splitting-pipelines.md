@@ -1,6 +1,6 @@
 ---
 title: "Splitting Pipelines"
-date: 2018-08-11T21:08:41+02:00
+date: 2018-07-13T21:08:41+02:00
 categories: ["Scripting"]
 tags: ["Bash"]
 authors: ["Rob"]
