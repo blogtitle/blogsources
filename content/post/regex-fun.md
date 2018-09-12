@@ -57,6 +57,8 @@ For more like this exploding behavior take a look [at this video](https://vimeo.
 
 The detail that should worry you the most is that the previous example is a 4 characters long regexp that is trying to match a **regular language**. Imagine the consequences you could get with a much longer and more complex regexp.
 
+NOTE: the golang builtin regexp engine does not exhibit this kind of explosive behavior, but this is not a good reason to use regexps everywhere.
+
 ## Surprises
 Consider the following expression to match some Java v1 keywords (not all are included for brevity):
 ```
@@ -94,7 +96,7 @@ I hope I have proven my point and made you think twice before using regexps in y
 
 That said, let's have some fun. The following regexps are the creation of an afternoon spent with [Anna](/authors/anna/) playing a [CTF](https://ctftime.org/ctf-wtf/) a couple of years ago.
 
-If anything that follows leaves you puzzled, please visit [regex101](https://regex101.com/) that will probably explain better than me what is going on in the regexp. If the regex doesn't run it's probably because I'm using some arcane (perl|ruby)-specific syntax, in that case please use [rubular](http://rubular.com/).
+If anything that follows leaves you puzzled, please visit [regex101](https://regex101.com/) that will probably explain better than me what is going on in the regexp. If the regexp doesn't run it's probably because I'm using some arcane (perl|ruby)-specific syntax, in that case please use [rubular](http://rubular.com/).
 
 ## Fun, part 1: push-down automata
 Regular expressions, as said before, should only be able to match regular languages, but this is clearly not the case for PCRE (Perl-compatible regular expressions).
