@@ -23,4 +23,4 @@ The blog is built using the static site generator [hugo](https://gohugo.io/).
 
 The theme is [clorine](https://github.com/AnnaOpss/hugo-chlorine-theme): a fork of the [natrium](https://themes.gohugo.io/hugo-natrium-theme/) theme, changed by Anna to support multiple authors and slightly adjusted by Rob for colors and fonts.
 
-The font used to render code blocks is the awesome [FiraCode](https://github.com/tonsky/FiraCode)
+The font used to render code blocks is the awesome [FiraCode](https://github.com/tonsky/FiraCode).
