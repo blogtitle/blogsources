@@ -22,7 +22,7 @@ Then, almost immediately after, a Friday night while watching some series on Net
 
 So you restart the process, but this time without blog posts or any other web content. You find some sporadic questions asked here and there, but with wrong answers or no answers at all. Maybe the people who asked the question also found the answer sooner or later, or just gave up, you can't know.
 
-TODO xkcd knowledge of the ancients.
+![Wisdom of the ancients](/research/wisdom_of_the_ancients.png)
 
 So you embrace a metaphorical pickaxe and start digging where no other left a sign, you take your walking cane and start exploring a forest with few, barely visible footprints. You question yourself, read books, give up, go back, try to put your thoughts on paper, crumple up the sheets afterwards, skip some meals by accident, suddenly forget about the problem and suddenly again find yourself unable to think about anything else.
 That's the moment when you wake up in the middle of the night and your dreams have rephrased the problem for you, so you reach for your phone in the dark, search for the two things that you still miss, and finally find a potential answer. You might not find the right one at first, but sooner or later either in your dreams, drunk nights or average days you will move forward. After months of stall, you. Move. Forward. Either alone or speaking with peers and random folks on the internet, you eventually find the answers you want.
@@ -45,7 +45,7 @@ So you exclude yourself from the query, and you find **a big nothing**. So you a
 
 A professor in high school showed an image of this painting to the class:
 
-TODO Carolina morning
+![Edward Hopper, Carolina Morning](/research/carolina_morning_3.png)
 
 He told us that life would have, someday, put a choice in front of us. A choice between the commodities of life, the solution to our basic needs, and something more.
 
@@ -60,20 +60,10 @@ And that is what hit me, 10 years later.
 
 Several days later a close friend of mine saw me troubled, and asked me: "What are you thinking about?".
 
-TODO gif del tizio che prova a spiegare la cospirazione
+I tried to state the problem at hand, and it was even hard to make it clear **why** it was a problem, let alone being able to discuss it with him. So I asked him what was he working on, and I was just able to grasp a small part of it.
 
-I tried to state the problem at hand, and it was hard to make it clear **why** it was a problem, let alone being able to discuss it with him. So I asked him what was he working on, and I was just able to grasp a small part of it.
+There were two friends, each one trying to make progress, find answers to hard questions, each one very far in the infinite grass field of science, too far away from each other to be able to provide directions.
 
-TODO gif I know some words of this
+So the next day and the following ones, after work, several years after that Sunday morning, I went home, picked up my figurative walking cane, and kept walking, my favourite music in the headphones, my fluffy pets with me, and an universe to discover ahead.
 
-There were two friends, each one trying to make progress, find answers to hard questions, each one very far in the infinite grass field of science, too far away from each other to be able to provide directions to each other.
-
-I went to work the morning after realizing this, and a colleague asked me "What's up?".
-
-"Not much, how about you?"
-
-TODO image here?
-
-And that night, after work, three years after that Sunday morning, I went home, picked up my figurative walking cane, and kept walking, my music in the headphones, my fluffy pets with me, and an universe to discover ahead.
-
-TODO passeggiatore in mare di nebbia
+![Fog wanderer](/research/sea_fog.jpg)
