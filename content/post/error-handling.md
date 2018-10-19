@@ -1,8 +1,8 @@
 ---
 title: "Considerations on error handling"
 date: 2018-08-10T12:34:41+02:00
-categories: ["Golang", "Software engineering", "Funny"]
-tags: ["Software engineering", "Golang", "Funny"]
+categories: ["Golang", "Software engineering"]
+tags: ["Funny"]
 authors: ["Rob"]
 ---
 
@@ -127,7 +127,7 @@ return "a";
 
 What does this code return?
 
-Luckily Java well behave and enters the first catch block, and the code logs correctly and returns "a".
+Luckily Java well behaves and enters the first catch block, and the code logs correctly and returns "a".
 
 But it gets trickier.
 

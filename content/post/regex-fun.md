@@ -1,7 +1,7 @@
 ---
 title: "Regexp Fun"
 date: 2018-09-12T19:57:02+02:00
-categories: ["Funny"]
+categories: ["Misc"]
 tags: ["Funny"]
 authors: ["Rob"]
 ---
