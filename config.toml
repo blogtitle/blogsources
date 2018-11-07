@@ -6,11 +6,12 @@ preserveTaxonomyNames = true
 rssLimit = 10
 paginate = 10
 pygmentsCodefences = true
-pygmentsStyle = "native"
+pygmentsUseClasses = true
+pygmentsCodefencesGuessSyntax = true
 googleAnalytics = "UA-119970190-1"
 
 [taxonomies]
-    category = "categories"  
+    category = "categories"
     tag = "tags"
     author = "authors"
 
@@ -22,7 +23,7 @@ googleAnalytics = "UA-119970190-1"
     name = "About"
     url = "/about/"
     weight = -110
-    
+
 [[menu.main]]
     name = "Tags"
     url = "/tags"
@@ -42,7 +43,7 @@ googleAnalytics = "UA-119970190-1"
     description = ""
 
     [params.logo]
-    url = "clorine.png"
+    url = "dotstar.png"
     width = 50
     height = 50
     alt = "Logo"
@@ -53,6 +54,6 @@ googleAnalytics = "UA-119970190-1"
     lastName = "Bernardi"
 
     [params.authors.rob]
-    id = "roberto"
-    firstName = "Roberto"
+    id = "rob"
+    firstName = "Roberto (empijei)"
     lastName = "Clapis"
