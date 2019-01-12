@@ -144,6 +144,30 @@ func FindTipping(aa, bb ConfigurableBenchmarker, lower, upper int) (int,error) {
 }
 ```
 
+Here is some output with `lower = 1` and `upper = 100` and some logging sprinkled here and there:
+```
+Calculating initial values...
+AnalysingTraffic: [1KB] Buffered 1107 ns/op < 1986 ns/op Streamed
+AnalysingTraffic: [100KB] Buffered 87985 ns/op >= 69509 ns/op Streamed
+Starting search...
+Binsearch: lower: 1, upper: 100
+AnalysingTraffic: [50KB] Buffered 43455 ns/op >= 35242 ns/op Streamed
+Binsearch: lower: 1, upper: 50
+AnalysingTraffic: [25KB] Buffered 22693 ns/op >= 19506 ns/op Streamed
+Binsearch: lower: 1, upper: 25
+AnalysingTraffic: [13KB] Buffered 11355 ns/op >= 10263 ns/op Streamed
+Binsearch: lower: 1, upper: 13
+AnalysingTraffic: [7KB] Buffered 4964 ns/op < 5824 ns/op Streamed
+Binsearch: lower: 7, upper: 13
+AnalysingTraffic: [10KB] Buffered 7415 ns/op < 8140 ns/op Streamed
+Binsearch: lower: 10, upper: 13
+AnalysingTraffic: [11KB] Buffered 8609 ns/op < 8765 ns/op Streamed
+Binsearch: lower: 11, upper: 13
+AnalysingTraffic: [12KB] Buffered 9828 ns/op < 10157 ns/op Streamed
+Tipping point was found at 12
+Most efficient for input of smaller sizes was "Buffered"
+Most efficient for input of bigger sizes was "Streamed"
+```
 
 With this I could automatically detect the tipping point for my code on the current machine. Now I needed to run it. I could have put instructions in the README, but where's the fun in that?
 
