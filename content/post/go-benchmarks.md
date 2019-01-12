@@ -2,7 +2,7 @@
 title: "Go Advanced Benchmarking"
 date: 2019-01-11T22:15:43+01:00
 categories: ["Go", "Optimization"]
-tags: ["Benchmark","Go build tags", "go:generate"]
+tags: ["Benchmark","Go build tags", "go:generate", "golang"]
 authors: ["Rob"]
 ---
 # The story
@@ -73,7 +73,7 @@ Here `n` are the total bytes read from a connection on `Close`. `k` is just a co
 The hard part was to choose the threshold to switch implementation: I ran some benchmarks and found the tipping point where the streaming would start performing better better than the buffering, but I soon found out that the value heavily depended on the computer running the code.
 
 # The overkill
-In most cases running the benchmark on the author's laptop is enough to decide the constant to use, like [Go does  for `math/big`](https://github.com/golang/go/issues/25580) heuristics to choose the right algorithm to perform computation.
+In most cases running the benchmark on the author's laptop is enough to decide the constant to use, like [Go does  for `math/big`](https://github.com/golang/go/blob/50bd1c4d4eb4fac8ddeb5f063c099daccfb71b26/src/math/big/calibrate_test.go#L18) heuristics to choose the right algorithm to perform computation. The problem with this approach is that, according to the contributors to math/big, this [can cause an error of more than 100%](https://github.com/golang/go/issues/25580).
 
 Needless to say, I don't like that approach, so I started putting together the tools go offered me. I didn't want to use makefiles or anything external, I didn't want my users to install or run anything exotic on their machines before being able to use my code, so I reasoned about **what was already available to the users compiling my library**.
 
@@ -228,3 +228,18 @@ analyse
 ```
 
 So I can now `go get` or `git clone` my package, `go generate` it, and have it run optimized for my machine.
+
+# Aftermath
+Here are the final benchmarks for the three solutions. For the machine I ran this benchmarks on the tipping point was at 12K. Measurements are in `ns/op`.
+```
+Dim |  Buff  | Adapt  | Stream
+----|--------|--------|-------
+ 1K |  1159  |  1278  |   1965
+ 2K |  1723  |  1868  |   2574
+ 4K |  2842  |  3055  |   4450
+ 8K |  5644 ←|→ 5929  |   7446
+16K | 15359  | 13478 ←|→ 13539
+32K | 29814  | 25430  |  24980
+64K | 58821  | 49078  |  48596
+```
+The adaptive solution pays a little price to measure traffic size so it is never as good as the best of the other ones but it is **almost optimal**. On the other hand, the adaptive solution **is always better than the worse option**.
