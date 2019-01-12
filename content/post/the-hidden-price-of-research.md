@@ -4,7 +4,6 @@ date: 2018-10-19T15:42:57+02:00
 categories: ["Inspirational"]
 tags: ["Art","Thoughts"]
 authors: ["Rob"]
-draft: true
 ---
 
 You wake up one Sunday morning and think: "how the hell does that thing work?".
