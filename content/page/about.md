@@ -8,7 +8,7 @@ This blog is about everything that the authors want to talk about!
 # The authors
 
 ## [Anna] (https://blogtitle.github.io/authors/anna/)
-Anna is a traveler, yogi, scuba diver and many other things. Between her adventures she enjoys writing Go code, currently developing [Wapty](https://github.com/empijei/wapty). She is now based in San Francisco working with Stripe's security team.
+Anna is a traveler, yogi, scuba diver and many other things. Between her adventures she enjoys writing Go code. She is now based in San Francisco working with Stripe's security team.
 
 Opinions are her own.
 
