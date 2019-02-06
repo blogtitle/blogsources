@@ -1,7 +1,7 @@
 ---
 title: "Unmarshaling JSON in Golang"
 date: 2018-05-30T16:35:28-07:00
-categories: ["Golang"]
+categories: ["Go", "Golang"]
 tags: ["Parsing", "JSON"]
 authors: ["Anna"]
 ---
