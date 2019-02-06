@@ -17,4 +17,64 @@ If you would like to have some more context on what brought me to Go, please rea
 
 If you'd like to know why I still use Go, continue reading.
 
-# Simplicity
+# Readability
+* No need for much context to understand code
+* All idiomatic Go code is readable in the same way
+* No macros, metaprogramming, elaborated constructs, override, overload
+* Two accessibility levels
+* Tests are just programs
+
+# Writability
+* Little to almost 0 noise
+* Easy, not much you need to know
+* Compiler returns clear error messages
+* Write code, not types or meta-types or annotations
+* Composition + Promotion
+* Interfaces
+* Garbage collected
+
+# Multithreading
+* select
+* go
+* chan
+* sync package
+* Garbage collected
+
+# Reliability
+* Rare crashes
+* Almost no compiler bugs
+* No surprises
+
+# Performance
+* Fast to run
+* Fast to compile
+* Very fast to do parallel stuff
+
+# Type system
+* Strong
+* Static, but can be dynamic if needed
+* Ducktyping
+* No magic
+
+# Standard library
+* huge
+* powerful
+* well documented, with examples
+
+# Toolchain
+* get
+* doc
+* fmt
+* vet
+* build (cross platform)
+* test (+ cover and race)
+* trace
+* pprof
+* present
+
+# Ecosystem
+* Confs
+* Community
+* Protobufs
+* Many libraries
+* go tour
