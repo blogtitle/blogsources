@@ -1,7 +1,7 @@
 ---
 title: "Go Advanced Benchmarking"
 date: 2019-01-11T22:15:43+01:00
-categories: ["Go", "Optimization"]
+categories: ["Go", "Golang", "Optimization"]
 tags: ["Benchmark","Go build tags", "go:generate", "golang"]
 authors: ["Rob"]
 ---
