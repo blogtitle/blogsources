@@ -1,8 +1,8 @@
 ---
 title: "Considerations on error handling"
 date: 2018-08-10T12:34:41+02:00
-categories: ["Go", "Golang", "Software engineering"]
-tags: ["Funny"]
+categories: ["Go", "Software engineering"]
+tags: ["Funny", "Golang"]
 authors: ["Rob"]
 ---
 
