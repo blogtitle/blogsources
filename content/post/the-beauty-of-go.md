@@ -53,6 +53,7 @@ If you'd like to know why I still use Go, continue reading.
 # Type system
 * Strong
 * Static, but can be dynamic if needed
+* Anything is a receiver
 * Ducktyping
 * No magic
 
