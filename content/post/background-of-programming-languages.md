@@ -7,16 +7,16 @@ authors: ["Rob"]
 draft: true
 ---
 
-My total experience with coding as of today is 14 years. The time spans in the titles of this post overlap.
+My total experience with coding as of today is 14 years. The time spans in the titles of this post might overlap.
 
 # Pascal (2 years)
 
 My first language was Pascal, I was 13 and was using Turbo Pascal at school to learn how to code.
 
 It wasn't long until I realized I really loved coding. After two years my programming teacher complimented me for writing my own sorting algorithm that could run a little bit faster than what we studied at school.
-I created something very similar to [Shell Sort](https://en.wikipedia.org/wiki/Shellsort), while we used to sort things with Bubble Sort.
+I created something very similar to [Shell Sort](https://en.wikipedia.org/wiki/Shellsort), and in class we used to sort things with Bubble Sort.
 
-It's been 12 years and I'm still unable to determine the time complexity of it, but this is a story for another time.
+It's been 12 years and I'm still unable to determine the time complexity of my algorithm, but this is a story for another time.
 
 If you've never seen Pascal, it roughly looks like this:
 ```pascal
@@ -77,7 +77,7 @@ End Namespace
 Important features that I still like very much:
 
 * The _wordyness_ of this code: there are almost no symbols, it is just words
-* Closing blocks has sugar: `End` is always followed by something and oyu don't spend time looking for a matching `{`
+* Closing blocks has sugar: `End` is always followed by something and you don't spend time looking for a matching `{`
 * There are **no semicolons**: to not end a statement you can use underscores
 * Docs is in the code in a well-defined way
 * You could ReDim arrays to grow or shrink them both preserving and not preserving values. This is similar to how Go slices work
