@@ -1,10 +1,9 @@
 ---
 title: "A (un)biased story"
-date: 2019-02-02T12:07:43-08:00
+date: 2019-02-19T12:07:43-08:00
 categories: ["Inspirational", "Life"]
 tags: ["Thoughts", "Tips"]
 authors: ["Anna"]
-draft: true
 ---
 
 I want to tell you a story somebody shared with me. 
@@ -44,7 +43,7 @@ What was most interesting to me about this was that out of 20 people in the room
 Take a few minutes to rank them yourself. Who would you rank as the meanest? And the kindest?
 Moreover, what gender did your brain attribute to the characters?
 
-[TODO image here]
+![Table](/biased-story/table.jpg)
 
 Done? Are you sure about your answers?
 What if I tell you none of the characters had bad intentions? That nobody was acting in bad faith?
