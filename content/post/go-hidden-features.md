@@ -2,7 +2,7 @@
 title: "Go less used features"
 date: 2019-02-06T19:39:41+01:00
 categories: ["Go"]
-tags: ["Go", "Golang"]
+tags: ["golang"]
 authors: ["Rob"]
 draft: true
 ---

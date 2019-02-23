@@ -1,8 +1,8 @@
 ---
-title: "Go Advanced Benchmarking"
+title: "Go advanced benchmarking"
 date: 2019-01-11T22:15:43+01:00
-categories: ["Go", "Golang", "Optimization"]
-tags: ["Benchmark","Go build tags", "go:generate", "golang"]
+categories: ["Go"]
+tags: ["benchmark","go build tags", "go:generate", "golang", "optimization"]
 authors: ["Rob"]
 ---
 # The story

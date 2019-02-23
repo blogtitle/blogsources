@@ -2,7 +2,7 @@
 title: "Kauai"
 date: 2018-05-25T21:35:39-07:00
 authors: ["Anna"]
-tags: ["Islands", "Scuba"]
+tags: ["islands", "scuba"]
 categories: ["Travels"]
 draft: false
 ---

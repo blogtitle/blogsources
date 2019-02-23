@@ -1,8 +1,8 @@
 ---
 title: "Some interesting Golang videos"
 date: 2018-08-19T12:07:20-07:00
-categories: ["Go", "Golang", "Software Engineering"]
-tags: ["Videos"]
+categories: ["Go"]
+tags: ["resources", "golang"]
 authors: ["Rob"]
 draft: true
 ---

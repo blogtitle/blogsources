@@ -1,8 +1,8 @@
 ---
 title: "Rob's personal history of programming languages"
 date: 2019-02-06T19:39:41+01:00
-categories: ["Software Engineering"]
-tags: ["Software", "Programming Languages"]
+categories: ["Software engineering"]
+tags: ["engineering", "programming languages"]
 authors: ["Rob"]
 draft: true
 ---

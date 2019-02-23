@@ -1,8 +1,8 @@
 ---
 title: "[Rant] Video cables formats and other damnations."
 date: 2019-02-16T12:46:44+01:00
-categories: ["RANT"]
-tags: ["RANT","video","audio"]
+categories: ["Funny"]
+tags: ["rant","video","audio"]
 authors: ["Rob"]
 draft: true
 ---

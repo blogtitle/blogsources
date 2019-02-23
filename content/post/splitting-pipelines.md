@@ -1,8 +1,8 @@
 ---
 title: "Splitting Pipelines"
 date: 2018-07-13T21:08:41+02:00
-categories: ["Scripting"]
-tags: ["Bash"]
+categories: ["Software engineering"]
+tags: ["bash"]
 authors: ["Rob"]
 ---
 # The problem

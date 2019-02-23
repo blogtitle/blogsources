@@ -1,8 +1,8 @@
 ---
 title: "Let's talk about JavaScript"
 date: 2018-08-11T19:20:13+02:00
-categories: ["Misc"]
-tags: ["JavaScript", "Funny", "Rant"]
+categories: ["Funny"]
+tags: ["javascript", "funny", "rant"]
 authors: ["Rob"]
 ---
 

@@ -1,8 +1,8 @@
 ---
 title: "The beauty of Go"
 date: 2019-02-06T19:39:41+01:00
-categories: ["Go", "Golang", "Software Engineering"]
-tags: ["Go", "Golang", "Software", "Channels"]
+categories: ["Go", "Software engineering"]
+tags: ["golang", "engineering", "channels"]
 authors: ["Rob"]
 draft: true
 ---

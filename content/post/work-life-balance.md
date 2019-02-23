@@ -1,8 +1,8 @@
 ---
 title: "A tip from beyond"
 date: 2019-01-02T21:30:16+01:00
-categories: ["Life"]
-tags: ["Work Life Balance","Tips","Personal Story"]
+categories: ["Inspirational"]
+tags: ["work life balance","tips","personal story"]
 authors: ["Rob"]
 draft: true
 ---

@@ -1,8 +1,8 @@
 ---
 title: "Go: slices gotchas"
 date: 2019-02-22T21:12:56+01:00
-categories: ["Go", "Gotchas"]
-tags: ["Golang", "Go"]
+categories: ["Go"]
+tags: ["golang", "gotchas"]
 authors: ["Rob"]
 ---
 

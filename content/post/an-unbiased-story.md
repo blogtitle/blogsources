@@ -2,7 +2,7 @@
 title: "A (un)biased story"
 date: 2019-02-19T12:07:43-08:00
 categories: ["Inspirational", "Life"]
-tags: ["Thoughts", "Tips"]
+tags: ["thoughts", "tips"]
 authors: ["Anna"]
 ---
 

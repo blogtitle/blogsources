@@ -2,7 +2,7 @@
 title: "The Hidden Pri(c|s)e of Research"
 date: 2018-10-19T15:42:57+02:00
 categories: ["Inspirational"]
-tags: ["Art","Thoughts"]
+tags: ["art","thoughts"]
 authors: ["Rob"]
 ---
 

@@ -1,8 +1,8 @@
 ---
 title: "Software Disenchantement, AKA Oh $DEITY why is it so bad?"
 date: 2018-09-24T18:07:11+02:00
-categories: ["Software engineering"]
-tags: ["Rant", "Funny"]
+categories: ["Funny"]
+tags: ["rant", "funny"]
 authors: ["Rob"]
 draft: true
 ---

@@ -1,8 +1,8 @@
 ---
 title: "Some useful patterns"
 date: 2019-02-19T08:37:12+01:00
-categories: ["Software Engineering", "Golang"]
-tags: ["Golang", "Software Engineering", "Programming Patterns"]
+categories: ["Software engineering", "Go"]
+tags: ["golang", "programming patterns"]
 authors: ["Rob"]
 ---
 
