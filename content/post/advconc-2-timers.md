@@ -112,7 +112,7 @@ t := time.AfterFunc(1*time.Second, func() {
 // This will deadlock.
 <-t.C
 ```
-Also, at the moment of writing, resetting the timer does not make the runtime call `f` again.
+Also, at the moment of writing, resetting the timer makes the runtime call `f` again after the passed duration, but it is not documented so it might change in the future.
 #### time.NewTimer
 > Official doc: NewTimer creates a new Timer that will send the current time on its channel after at least duration d.
 
