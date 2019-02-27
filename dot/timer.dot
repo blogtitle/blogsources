@@ -1,0 +1,25 @@
+digraph {
+	tc [shape=diamond,label="Executed <-t.C?"]
+	tc2 [shape=square,label="<-t.C\n(necessary\njust for reuse)"]
+	trst [shape=square,label="t.Reset()"]
+	treus [shape=square,label="Reuse?"]
+	tss [shape=square,label="t.Stop()"]
+	ts [shape=diamond,label="t.Stop()"]
+	go [shape=square,label="manual\ngoroutine\nwait\nif needed"]
+
+	AfterFunc -> tss;
+	AfterFunc -> go;
+	tss -> go[label="true"];
+	tss -> end[label="false"];
+	go -> end;
+
+	New -> tc;
+	tc -> ts[label="No"];
+	ts -> tc2[label="false"];
+	tc -> treus[label="Yes"];
+	ts -> treus[label="true"];
+	tc2 -> treus;
+	treus -> trst[label="Yes"];
+	trst -> tc;
+	treus -> end[label="No"];
+}

@@ -41,7 +41,7 @@ Since performance is not really relevant here (after all we are waiting) the onl
 
 Beware that re-using timers is tricky, so keep in mind that it might not be worth the risk to just save 10 allocs/op.
 
-> NOTE: A post on how to juggle timers will be written in the future, stay tuned.
+In case you are interested [here](https://blogtitle.github.io/go-advanced-concurrency-patterns-part-2-timers) is a post on how to juggle timers.
 
 # First come first served
 Sometimes you want to write the same message to many channels, writing to whichever is available first, but **never writing the same message twice** on the same channel.
