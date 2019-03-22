@@ -1,5 +1,5 @@
 ---
-title: "Go Advanced concurrency patterns: part 2 (timers)"
+title: "Go advanced concurrency patterns: part 2 (timers)"
 date: 2019-02-25T22:56:23+01:00
 categories: ["Go", "Concurrency"]
 tags: ["golang", "concurrency", "patterns", "engineering"]
