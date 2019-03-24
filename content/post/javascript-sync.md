@@ -156,11 +156,15 @@ class WaitGroup {
   }
 
   wait() {
-    let count = Atomics.load(this._wg, 0);
-    if (count == 0){
-      return;
+    for (;;) {
+      let count = Atomics.load(this._wg, 0);
+      if (count == 0){
+        return;
+      }
+      if (Atomics.wait(this._wg, 0, count) == 'ok') {
+        return;
+      }
     }
-    Atomics.wait(this._wg, 0, count)
   }
 }
 ```
@@ -168,7 +172,7 @@ As first thing the `add` implementation increments the counter with the given va
 
 The `notify` is called with the default amount of waiters, which is infinity.
 
-The reason we are not checking if the counter is `0` in a wakeup from a wait is that someone else might have incremented the value after it reached `0`, before we woke up.
+The reason we are not checking if the counter is `0` in a wakeup from a wait is that a notify is called only in the event the counter reaches 0 during an add.
 
 # Put it together
 Here is a simple example of how to use those primitives:
