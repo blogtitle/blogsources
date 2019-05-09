@@ -176,3 +176,5 @@ Go has a low-power `goto` statement: you cannot do too many things with gotos. I
 # else
 
 # recover (add that it only recovers panics down the stack)
+
+# recursive types (the stateFn type in text/template)
