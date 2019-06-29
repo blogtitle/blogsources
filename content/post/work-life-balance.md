@@ -10,9 +10,9 @@ draft: true
 # Preface
 ---------
 
-What follows wants to be a tip to the reader, not a technical one, but a survival one.
+What follows wants to be a tip to the reader, not a technical one as usual, but a survival one.
 
-My career kicked off pretty fast, and in an unexpected way. A good dose of sheer luck and some skills got me where I am now, and I'm grateful for what I accomplished and I'm happy with what I got.
+My career kicked off pretty fast, in an unexpected way. A good dose of sheer luck and some skills got me where I am now, and I'm grateful for what I accomplished and I'm happy with what I got.
 
 # But
 -----

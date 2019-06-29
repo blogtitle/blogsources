@@ -223,8 +223,6 @@ func addLogging(h http.Handler) http.Handler {
 }
 ```
 
-## Fast CGI and external dependencies
-
 # The Server
 // TODO proper config
 
