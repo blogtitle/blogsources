@@ -9,7 +9,7 @@ draft: true
 Welcome to this introductory series on web security. I'll use simple snippets and hands-on examples to introduce fundamentals on the topic.
 Most server-side code will be in Go but you'll be able to understand it if you know any C-like language.
 
-This fist post is about the foundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
+This first post is about the foundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
 
 # It starts with a URI
 Universal Resource Identifier(URI) is something you deal with every day, whether you know about them or not. URIs are strings that commonly look like "https://github.com/empijei". Don't be fooled by the apparent simplicity of these things, they are not simple and often times can trip up experts in the field.
@@ -51,7 +51,7 @@ You can try this yourself by connecting on port 80 of any HTTP server with netca
 Let's unwrap what is going on here:
 
 * `GET` is the HTTP **method** or **verb** we are using. There is [a wide range of possible ones](TODO link), the most common being OPTIONS, GET, POST and HEAD.
-* `/hello` is the path we want. Usually this is taken from the URI as anything that comes after the host[:port] portion and before the `#` character.
+* `/hello` is the path we want. Usually this is taken from the URI as anything that comes after the `host[:port]` portion and before the `#` character.
 * `HTTP/1.1` is the protocol we want to use to talk to the server. This implies that a "Host" header will follow.
 * `Host: localhost` is a header. Headers are always in the form `Key: value`. In this case this means that on the machine we are connected to we want to talk to the host that is responding to the name "localhost". This allows multiple virtual hosts to be served by the same machine. We will focus on the dangerous consequences of having the Host header specified so openly in the chapter on DNS rebinding attacks.
 * An empty line is needed to signal that headers are finished and the request body (if any) will follow. In this case we are using "GET" and we didn't specify a "Content-Length" header so the server starts responding as no body is expected.
@@ -130,7 +130,7 @@ Here is an example:
 Having data mixed with code is never a good idea. We'll see why in the chapter on XSS.
 
 # Which requires escaping
-As you probably noticed from the previous paragraph snippet, depending on teh context I was writing I had to use different comments delimiters. This is due to the fact that when HTML is processed there are several parsers at play.
+As you probably noticed from the previous paragraph snippet, depending on the context I was writing I had to use different comments delimiters. This is due to the fact that when HTML is processed there are several parsers at play.
 For example when the HTML processor sees the `<style>` tag, it knows that all the content of that tag until `</style>` is for the CSS parser. The same is valid for the other contexts: the HTML processor will need to call into other parsers and the JavaScript engine to correctly deal with the page.
 
 This fact has the interesting consequence that in JavaScript it is impossible to have the code `var scr = "</script>";` and it is necessary to do something like `var scr = "</scr" +"ipt>";` to prevent the HTML processor from switching context. We will see the proper way to do it in a few lines.
