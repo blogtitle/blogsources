@@ -29,7 +29,7 @@ Sometimes in web pages even the host is not specified, so the browser must provi
 We will focus on the dangerous consequences of allowing `javascript` and relative URIs in the chapter on Cross-Site Scripting(XSS).
 
 # It is transported over HTTP
-When the browser needs to retrieve a resource it usually performs an HTTP(HyperText Transfer Protocol) request to the server. Modern browsers all use HTTP 1.1 or above and the conversation usually looks like this:
+When the browser needs to retrieve a resource it usually performs a TCP(not described here) connection and then, over that, an HTTP(HyperText Transfer Protocol) request to the server. Modern browsers all use HTTP 1.1 or above and the conversation usually looks like this:
 
 Client connects to the server, and sends:
 ```http
@@ -68,8 +68,8 @@ The server then responds:
 
 There are also HTTP2 and QUIC in the party of protocols that are currently used, but you can assume they roughly behave like described above. The only difference is in speed and the ability for the server to push data to the client without the need for a pending request or open websocket.
 
-# It is optionally (hopefully) transported securely on TLS
-Most modern web services support secure connections over HTTPS. HTTPS is nothing else than the HTTP protocol over TLS(Transport Layer Security TODO check). This protocol secures the connection against data theft and data tampering, and authenticates the server to be the one we want to connect to. TLS can potentially provide mutual authentication, thus allowing the server to authenticate the client.
+# It is optionally (hopefully) transported securely over TLS
+Most modern web services support secure connections over HTTPS. HTTPS is nothing else than the HTTP protocol over TLS(Transport Layer Security) usually over TCP. This protocol secures the connection against data theft and data tampering, and authenticates the server to be the one we want to connect to. TLS can potentially provide mutual authentication, thus allowing the server to authenticate the client.
 
 The TLS handshake is briefly summarized below. Please note this is not an exhaustive description of TLS and it is simplified to the point it is not precise.
 
@@ -86,6 +86,7 @@ The TLS handshake is briefly summarized below. Please note this is not an exhaus
 * The server decrypts the key and starts communicating with the client by encrypting all traffic with the symmetric key exchanged in the previous point.
 
 The cipher suite agreed in the first part determine some important algorithms, the most relevant are:
+
 * how to validate the certificate
 * how to encrypt the traffic
 * how to check for message integrity
@@ -144,5 +145,10 @@ As you may imagine this requires some careful management by the programmer that 
 
 Stay tuned! Next post is on Cross-Site-Scripting(XSS) and will explain what happens when developers are not careful.
 
-# Want to know more?
-TODO links.
+# Recap
+If you want to send some JSON to a client and display it, you will have:
+
+* JSON escaped twice: to not break JS and HTML;
+* HTML potentially compressed and sent with HTTP;
+* HTTP resource fetched over TLS over TCP;
+* The resource is described by a URL that needs escaping itself;
