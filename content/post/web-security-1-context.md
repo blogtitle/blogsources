@@ -9,7 +9,7 @@ draft: true
 Welcome to this introductory series on web security. I'll use simple snippets and hands-on examples to introduce fundamentals on the topic.
 Most server-side code will be in Go but you'll be able to understand it if you know any C-like language.
 
-This fist post is about the foundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
+This first post is about the foundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
 
 # It starts with a URI
 Universal Resource Identifier(URI) is something you deal with every day, whether you know about them or not. URIs are strings that commonly look like "https://github.com/empijei". Don't be fooled by the apparent simplicity of these things, they are not simple and often times can trip up experts in the field.
