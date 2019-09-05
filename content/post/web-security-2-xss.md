@@ -155,6 +155,7 @@ If you want to secure you application from XSS you should:
 * Adopt [strict CSP](https://csp.withgoogle.com/docs/strict-csp.html);
 * Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
 
+# Let's apply this to Go
 
 Trusted Types are client side, so not much for Go to do.
 
