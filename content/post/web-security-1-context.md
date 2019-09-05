@@ -1,6 +1,6 @@
 ---
 title: "Rob'n Go security pearls: fundamentals"
-date: 2019-08-21T02:52:26-07:00
+date: 2019-09-05T12:25:40+02:00
 categories: ["Web security"]
 tags: ["web","security","golang"]
 authors: ["Rob"]
@@ -19,7 +19,7 @@ URIs are composed by the following parts:
 [scheme:][//[userinfo@]host[:port]][/]path[?query][#fragment]
 ```
 
-The most common scheme are `http` and `https`, but `javascript` and `mailto` are also broadly used.
+The most common schemes are `http` and `https`, but `javascript` and `mailto` are also broadly used.
 This first part instruct the application that needs to use the URI on how to interpret the rest. It is not unusual to have custom schemes for specific applications, so that everything else in the URI is determined by that application and can use a custom format. One example for this is `smb` which allows on some operating systems to browse remote files on other machines.
 
 Whatever comes after the scheme depends on it, so if it is omitted the client application (the browser from now on) needs to decide a default one when the user types a URI in the address bar.
@@ -45,7 +45,7 @@ Content-Length: 11
 
 hello world
 ```
-You can try this yourself by connecting on port 80 of any HTTP server with netcat or telnet and writing the request manually (hit return twice after done typing the host).
+You can try this yourself by connecting to port 80 of any HTTP server with netcat or telnet and writing the request manually (hit return twice after done typing the host).
 
 Let's unwrap what is going on here:
 
@@ -54,7 +54,8 @@ Let's unwrap what is going on here:
 * `HTTP/1.1` is the protocol we want to use to talk to the server. This implies that a "Host" header will follow.
 * `Host: localhost` is a header. Headers are always in the form `Key: value`. In this case this means that on the machine we are connected to we want to talk to the host that is responding to the name "localhost". This allows multiple virtual hosts to be served by the same machine. We will focus on the dangerous consequences of having the Host header specified so openly in the chapter on DNS rebinding attacks.
 * An empty line is needed to signal that headers are finished and the request body (if any) will follow. In this case we are using "GET" and we didn't specify a "Content-Length" header so the server starts responding as no body is expected.
-Note: in HTTP lines are separated by "\r\n" and not just "\n". While some modern servers might accept single separators it is always better to use both, so our request will end with bytes `[0x0d 0x0a 0x0d 0x0a]` in this case.
+
+> Note: in HTTP lines are separated by "\r\n" and not just "\n". While some modern servers might accept single separators it is always better to use both, so our request will end with bytes `[0x0d 0x0a 0x0d 0x0a]` in this case.
 
 The server then responds:
 
@@ -84,6 +85,7 @@ The TLS handshake is briefly summarized below. Please note this is not an exhaus
  * the client trusts who has the private key matching the public one it has validated;
  * only who has the private key can decipher what is encrypted with the public one;
  * only who has the private key can sign a certificate in a way that matches the public one.
+* The rest of the communication is encrypted with the shared secret.
 
 The cipher suite agreed in the first part determine some important algorithms, the most relevant are:
 
