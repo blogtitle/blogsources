@@ -155,3 +155,63 @@ If you want to secure you application from XSS you should:
 * Adopt [strict CSP](https://csp.withgoogle.com/docs/strict-csp.html);
 * Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
 
+
+Trusted Types are client side, so not much for Go to do.
+
+Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"`.
+
+```go
+package main
+
+import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
+)
+
+const (
+	cspKey = "csp-nonce"
+	cspTpl = "object-src 'none'; script-src 'nonce-%s'; base-uri 'self'"
+)
+
+func addHeader(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		nonce := genNonce()
+		w.Header().Set("Content-Security-Policy",
+			fmt.Sprintf(cspTpl, nonce))
+		ctx := context.WithValue(r.Context(), cspKey, nonce)
+		h.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+var tpl = template.Must(template.New("hello").Parse(`
+<script nonce="{{.CSPNonce}}"> alert("It works!"); </script>
+<script> alert("This doesnt!"); </script>`))
+
+func main() {
+	http.Handle("/", addHeader(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tpl.Execute(w, map[string]interface{}{
+				"CSPNonce": r.Context().Value(cspKey),
+			})
+		})))
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func genNonce() string {
+	var b [20]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		panic(err)
+	}
+	return base64.StdEncoding.EncodeToString(b[:])
+}
+```
+Please note that here I'm decorating only a `func` but an entire `http.ServeMux` can be protected with CSP this way.
+
+Cookies attributes can be set together with cookies by using [the standard http package](https://golang.org/pkg/net/http/#Cookie).
+
+This is all for today, stay tuned for the chapter on Cross Site Request Forgery(CSRF).
