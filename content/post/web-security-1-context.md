@@ -4,15 +4,14 @@ date: 2019-08-21T02:52:26-07:00
 categories: ["Web security"]
 tags: ["web","security","golang"]
 authors: ["Rob"]
-draft: true
 ---
 Welcome to this introductory series on web security. I'll use simple snippets and hands-on examples to introduce fundamentals on the topic.
 Most server-side code will be in Go but you'll be able to understand it if you know any C-like language.
 
-This fist post is about the foundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
+This first post is about the fundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
 
 # It starts with a URI
-Universal Resource Identifier(URI) is something you deal with every day, whether you know about them or not. URIs are strings that commonly look like "https://github.com/empijei". Don't be fooled by the apparent simplicity of these things, they are not simple and often times can trip up experts in the field.
+Universal Resource Identifier([URI](https://tools.ietf.org/html/rfc3986)) is something you deal with every day, whether you know about them or not. URIs are strings that commonly look like "https://github.com/empijei". Don't be fooled by the apparent simplicity of these things, they are not simple and often times can trip up experts in the field.
 
 URIs are composed by the following parts:
 ```
@@ -50,7 +49,7 @@ You can try this yourself by connecting on port 80 of any HTTP server with netca
 
 Let's unwrap what is going on here:
 
-* `GET` is the HTTP **method** or **verb** we are using. There is [a wide range of possible ones](TODO link), the most common being OPTIONS, GET, POST and HEAD.
+* `GET` is the HTTP **method** or **verb** we are using. There is [a wide range of possible ones](https://annevankesteren.nl/2007/10/http-methods), the most common being OPTIONS, GET, POST and HEAD.
 * `/hello` is the path we want. Usually this is taken from the URI as anything that comes after the host[:port] portion and before the `#` character.
 * `HTTP/1.1` is the protocol we want to use to talk to the server. This implies that a "Host" header will follow.
 * `Host: localhost` is a header. Headers are always in the form `Key: value`. In this case this means that on the machine we are connected to we want to talk to the host that is responding to the name "localhost". This allows multiple virtual hosts to be served by the same machine. We will focus on the dangerous consequences of having the Host header specified so openly in the chapter on DNS rebinding attacks.
@@ -60,8 +59,8 @@ Note: in HTTP lines are separated by "\r\n" and not just "\n". While some modern
 The server then responds:
 
 * `HTTP/1.1` means the server agreed on the protocol, we can proceed.
-* `200 OK` is the status. This means everything went fine with our request. If we requested, for example, a resource that was not on the server we would have gotten `404 Not found`. The standard statuses are numerous and can be found [on wikipedia](TODO link).
-* `Content-Type: text/plain; charset=utf-8` is a composed header that instructs the client on how to interpret the response body. In this case it says that it is just plain text and uses [UTF 8](TODO link) as encoding. We will see the dangers of this header or the lack thereof in the chapter on XSS.
+* `200 OK` is the status. This means everything went fine with our request. If we requested, for example, a resource that was not on the server we would have gotten `404 Not found`. The standard statuses are numerous and can be found [on Wikipedia](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes).
+* `Content-Type: text/plain; charset=utf-8` is a composed header that instructs the client on how to interpret the response body. In this case it says that it is just plain text and uses [UTF 8](https://en.wikipedia.org/wiki/UTF-8) as encoding. We will see the dangers of this header or the lack thereof in the chapter on XSS.
 * `Content-Length: 11` tells the client that the body is eleven bytes long.
 * Empty line signals to the client that headers are over and the body will follow. We will see the harmful consequences of using such a simple separator mechanism in the chapter on http splitting.
 * `hello world` is the response body.
@@ -79,11 +78,12 @@ The TLS handshake is briefly summarized below. Please note this is not an exhaus
 * Client validates the server certificate:
   * the current date is within the validity range (certificate is neither expired nor not yet valid);
   * it is not revoked (this needs certificate revocation lists to be updated);
-  * the signature is valid and emitted by an authority the client recognizes(this requires the client to have some trusted root certificates).
-  * These steps can recursively climb up the certificate tree.
-* The client then encrypts some random bytes with the server public key. Only who has the private key can then decrypt them.
-* Client: here is an encrypted blob, let's use this as a key from now on.
-* The server decrypts the key and starts communicating with the client by encrypting all traffic with the symmetric key exchanged in the previous point.
+  * the signature is valid and emitted by an authority the client recognizes(this requires the client to have some trusted root certificates);
+  * these steps can recursively climb up the certificate tree.
+* The client and the server then exchange a shared, symmetric secret based on some of these facts:
+ * the client trusts who has the private key matching the public one it has validated;
+ * only who has the private key can decipher what is encrypted with the public one;
+ * only who has the private key can sign a certificate in a way that matches the public one.
 
 The cipher suite agreed in the first part determine some important algorithms, the most relevant are:
 
@@ -114,7 +114,7 @@ Here is an example:
   <p>
     This is text.
   </p>
-  <a href="http://this-is-a-url/">This is text for the link</a>
+  <a href="http://this-is-a-uri/">This is text for the link</a>
   <a href="javascript:alert('This is JavaScript')">Run code</a>
   <svg>
     <!-- This is an image -->
@@ -130,7 +130,7 @@ Here is an example:
 Having data mixed with code is never a good idea. We'll see why in the chapter on XSS.
 
 # Which requires escaping
-As you probably noticed from the previous paragraph snippet, depending on teh context I was writing I had to use different comments delimiters. This is due to the fact that when HTML is processed there are several parsers at play.
+As you probably noticed from the previous paragraph snippet, depending on the context I was writing I had to use different comments delimiters. This is due to the fact that when HTML is processed there are several parsers at play.
 For example when the HTML processor sees the `<style>` tag, it knows that all the content of that tag until `</style>` is for the CSS parser. The same is valid for the other contexts: the HTML processor will need to call into other parsers and the JavaScript engine to correctly deal with the page.
 
 This fact has the interesting consequence that in JavaScript it is impossible to have the code `var scr = "</script>";` and it is necessary to do something like `var scr = "</scr" +"ipt>";` to prevent the HTML processor from switching context. We will see the proper way to do it in a few lines.
@@ -139,16 +139,17 @@ The main problem is that the HTML parser has no knowledge of the internal state 
 
 The right way to tackle this problem is to not use HTML special characters in non-HTML blocks. All characters that might be relevant for the HTML processor need to be "escaped" somehow.
 
-For example the symbol `<` will be encoded as `&lt;`. When the HTML processor sees that sequence it knows that it needs to decode it as a `<` and pass the decoded string to the JavaScript interpreter. this would turn `var scr = "</script>";` into `var scr = &quot;&lt;/script&gt;&quot;` which is not ambiguous anymore.
+For example the symbol `<` will be encoded as `&lt;`. When the HTML processor sees that sequence it knows that it needs to decode it as a `<` and pass the decoded string to the JavaScript interpreter. This would turn `var scr = "</script>";` into `var scr = &quot;&lt;/script&gt;&quot;` which is not ambiguous anymore.
+Please note that also URIs need encoding of some characters that are not allowed (e.g. spaces are translated to `%20`) or that are part of the special set (e.g. `/` becomes `%2f`) and this depends on the position of the URI those character appear. We will see something about the consequence of this in the next chapters.
 
 As you may imagine this requires some careful management by the programmer that is interpolating user data in a webpage, or the risk is that something that should be treated as data will be treated as code.
 
 Stay tuned! Next post is on Cross-Site-Scripting(XSS) and will explain what happens when developers are not careful.
 
 # Recap
-If you want to send some JSON to a client and display it, you will have:
+If you want to send some content to a client and display it, you will have:
 
-* JSON escaped twice: to not break JS and HTML;
-* HTML potentially compressed and sent with HTTP;
+* The content escaped as many times as many nested contexts it is sent in, no more, no less;
+* HTML sent with HTTP;
 * HTTP resource fetched over TLS over TCP;
-* The resource is described by a URL that needs escaping itself;
+* The resource is described by a URI that needs escaping itself;
