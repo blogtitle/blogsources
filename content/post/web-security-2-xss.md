@@ -6,7 +6,7 @@ tags: ["web","security","golang"]
 authors: ["Rob"]
 draft: true
 ---
-> This post is part of my security training for developers. You can find all other posts [here](https://blogtitle.github.io/categories/web-security/).
+> This post is part of my developer-friendly security series. You can find all other posts [here](https://blogtitle.github.io/categories/web-security/).
 
 # Preface: authentication
 In [the previous post](https://blogtitle.github.io/robn-go-security-pearls-fundamentals/) I briefly described how HTTP works and, as you might have noticed, it is a stateless protocol. Roughly every time you need to fetch a resource you have to issue a new request and if you need to access some restricted endpoint you need to **authenticate again**. As you can imagine this would cause some degradation in user experience if so the platform provides some ways to get around the problem.
@@ -23,7 +23,7 @@ Steps of a standard authentication process:
 * Every time the user agent(usually a browser) requests a resource in the scope of the cookie it also sends the cookie along;
 * When the server receives a requests it will lookup the cookie in the database and respond based on the user permissions.
 
-The server might not use a database but might decide to sign the cookie somehow to recognize the user later. Moreover some applications might use auth tokens instead of cookies. For the purpose of this post you can just assume that the JavaScript code running in a web application where the user is authenticated can do everything the user could. This is because cookies will be sent with every request and the other tokens can be retrieved by JavaScript at any time.
+The server might not use a database but might decide to sign the cookie somehow to recognize the user later. Moreover some applications might use authorization tokens instead of cookies. For the purpose of this post you can just assume that the JavaScript code running in a web application where the user is authenticated can do everything the user could. This is because cookies will be sent with every request and the other tokens can be retrieved by JavaScript at any time.
 
 This means that **developers have to be very careful with which code they allow to execute** in the context of their applications.
 
@@ -94,12 +94,13 @@ This will automatically be encoded in a way that an attacker could not break. Th
 
 If the first escaping wouldn't have been performed a string like `"; evilCode(); var b = "` would have executed `evilCode`.
 
-This might seem trivial but there are some complicated cases where escaping might not be intuitive, like inside `style` blocks or HTML attributes (where escaping depends on the attribute key). 0
-Currently the standard library supports 16 different escaping functions and it goes through 24 different possible valid states and contexts while parsing the templates. It is very well designed and has only very minor known issues. I advise against trying to do this by hand or re-implementing this logic yourself. For Go 1.13 as long as you don't interpolate data in [an html tag name](https://github.com/golang/go/issues/9200)(and why would you?) or [a template literal](https://github.com/golang/go/issues/19669)(you shouldn't use two templates together anyways) you are safe. 
+This might seem trivial but there are some complicated cases where escaping might not be intuitive, like inside `style` blocks or HTML attributes (where escaping depends on the attribute key). Currently the standard library supports 16 different escaping functions and it goes through 24 different possible valid states and contexts while parsing the templates. It is very well designed and has only very minor known issues. I advise against trying to do this by hand or re-implementing this logic yourself. For Go 1.13 as long as you don't interpolate data in [an html tag name](https://github.com/golang/go/issues/19669)(and why would you?) or [a template literal](https://github.com/golang/go/issues/9200)(you shouldn't use two templates together anyways) your app should be in a pretty good shape.
 
 Moreover all widespread open-source libraries that I found in the wild for Go and Rust **do not** perform contextual auto-escaping so keep in mind that if you want to use a template that is not `html/template` **you are putting yourself at risk**. On this topic I can only suggest to stick to the standard library to stay safe.
 
-> Note: in the near future Google is planning to open-source [another Go library](https://github.com/golang/go/issues/27926) that grants an even better level of protection against XSS, but it hasn't been released yet so stay tuned!
+> Note: in the near future Google is planning to open-source [another Go library](https://github.com/golang/go/issues/27926) that grants an even better level of protection against XSS. Stay tuned to be updated when it is released!
+
+If you want to know more about some bypasses and advanced details about contextual auto-escaping [here](https://rawgit.com/mikesamuel/sanitized-jquery-templates/trunk/safetemplate.html#problem_definition) is your poison.
 
 # Client-Side (DOM based)
 If you think using the proper template will save you from XSS, you're out of luck. There is still a whole family of XSS that is waiting behind the corner to hit you and your users when you less expect it. The server might do all the escaping correctly depending on the context the strings are interpolated in but, then, the client-side code might just decide to execute arbitrary code.
@@ -174,15 +175,15 @@ If you want to secure you application from XSS you should:
 
 1. Use templating engines with contextual auto-escaping ([Go standard library](https://golang.org/pkg/html/template/) or [Google closure templates](https://github.com/google/closure-templates) do it);
 1. Adopt [strict CSP](https://csp.withgoogle.com/docs/strict-csp.html);
-1. Add [Trusted Types](https://github.com/WICG/trusted-types) to your CSP whenever possible (even polyfilling should work fine) or make sure to carefully review all uses of [dangerous DOM APIs](TODO link);
+1. Add [Trusted Types](https://github.com/WICG/trusted-types) to your CSP whenever possible (even polyfilling should work fine) or make sure to carefully review all uses of [dangerous DOM APIs](https://wicg.github.io/trusted-types/dist/spec/#injection-sinks);
 1. Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
 
 # Let's apply this to Go!
-Trusted Types are client side, so not much for Go to do, but we can work on the rest.
+* Trusted Types are client side, so not much for Go to do, but we can work on the rest.
 
-For generating responses make sure you never write to an `http.ResponseWriter` with anything that is not an HTML template. It should be easy to catch in code review but it is also quite easy to write [an analyzer](TODO LINK) for it.
+* To generate responses make sure you always write to an `http.ResponseWriter` with an HTML template and nothing else. It should be easy to catch this mistake in code review but it is also quite easy to write an analyzer for it. If you want to try and write such a tool here is the [doc](https://godoc.org/golang.org/x/tools/go/analysis) and [a talk](https://www.youtube.com/watch?v=HDJE-_s3x8Q) about it. If you end up writing it, please [share it](https://staticcheck.io)!
 
-Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"` and **not** `text/template` and `math/rand`.
+* Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"` and **not** `text/template` and `math/rand`.
 
 ```go
 package main
@@ -238,4 +239,4 @@ Please note that here I'm decorating only a single handler but an entire `http.S
 
 Cookies attributes can be set together with cookies by using [the standard http package](https://golang.org/pkg/net/http/#Cookie).
 
-This is all for today, stay tuned for the chapter on Cross Site Request Forgery(CSRF).
+This is all for today, stay tuned for the next chapter: Cross Site Request Forgery(CSRF).
