@@ -6,8 +6,10 @@ tags: ["web","security","golang"]
 authors: ["Rob"]
 draft: true
 ---
+> This post is part of my security training for developers. You can find all other posts [here](https://blogtitle.github.io/categories/web-security/).
+
 # Preface: authentication
-In the previous post I briefly described how HTTP works and, as you might have noticed, it is a stateless protocol. Roughly every time you need to fetch a resource you have to issue a new request and if you need to access some restricted endpoint you need to **authenticate again**. As you can imagine this would cause some degradation in user experience if left this way so the platform provides some ways to get around the problem.
+In [the previous post](https://blogtitle.github.io/robn-go-security-pearls-fundamentals/) I briefly described how HTTP works and, as you might have noticed, it is a stateless protocol. Roughly every time you need to fetch a resource you have to issue a new request and if you need to access some restricted endpoint you need to **authenticate again**. As you can imagine this would cause some degradation in user experience if left this way so the platform provides some ways to get around the problem.
 
 Cookies are a built-in mechanism: whenever a server response contains a `Set-Cookie` header the browser will store the value in a so-called jar. From that moment on and until the cookie expires the browser will attach the cookie value to every request that is directed to that "endpoint" (more about this below).
 
@@ -31,6 +33,7 @@ Most programs and web applications need to store and/or send back some data to t
 Let's make an example:
 
 ```html
+<!-- This assumes you're using text/template -->
 <div>
 Hello {{.Username}} and welcome to our shop!
 </div>
@@ -57,9 +60,24 @@ In this example the `evilCode()` function is invoked.
 So an attack scenario would be that an evil hacker signs up in this application then sends a link to its profile to the victim. When the victim visits the profile the name of the attacker is improperly interpolated in the page and evil code is executed. This will cause the application to **perform actions in the name of the victim without them knowing**.
 
 # Server-Side XSS
-The example above is an instance of server-side XSS because the interpolation happens on the server side. To be more specific this is a case of stored XSS as it persists in the database of the application. Some XSS might only trigger by interpolating data from the request into the response, and those are called reflected XSS. In both cases the culprit is a lack of escaping.
+The example above is an instance of server-side XSS because the interpolation happens on the server side. To be more specific this is a case of stored XSS as it persists in the database of the application.
 
-If you are a developer you **don't want to think** about all the possible escaping contexts you are putting user controlled data in, you just want things to work. As I like to think about this: stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
+Some XSS might only trigger by interpolating data from the request into the response, and those are called reflected XSS. One example of reflected XSS in Go would be:
+```go
+func vulnerableHandler(w http.ResponseWriter, r *http.Request){
+  r.ParseForm()
+  tok := r.FormValue("token")
+  if !isValid(tok) {
+    fmt.Fprintf(w, "Invalid token: %q", tok)
+  }
+  //...
+}
+```
+This would reflect part of the input in the output without escaping, which causes XSS (you should never use `fmt` to write HTML).
+
+In both reflected and stored XSS the culprit is a **lack of proper escaping**.
+
+If you, like me, are a developer you **don't want to think** about all the possible escaping contexts you are putting user controlled data in, you just want things to work. As I like to think about this: stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
 
 If you are working with Go you are lucky. The `html/template` package does contextual auto-escaping. This means that when your templates are parsed the library detects in which context you are putting strings in, and it will pick a chain of escaping functions to properly encode it.
 
@@ -75,9 +93,9 @@ This will automatically be encoded in a way that an attacker could not break. Th
 * HTML: characters like `<` will be encoded to `&lt;` so that if the attacker is called `</script>` it will not break the "script" context and won't be able to inject HTML in the sources of the page.
 
 This might seem trivial but there are some less trivial cases where escaping might not be easy (like inside `style` blocks) or intuitive (HTML attribute values differ from HTML nodes). 
-Currently the standard library supports 16 different escaping functions and it goes through 24 different possible valid states while parsing the templates and still has a couple of bugs that might lead to XSS in very peculiar situations [1](https://github.com/golang/go/issues/19669)[2](https://github.com/golang/go/issues/9200). I advise against trying to do this by hand or re-implementing this logic.
+Currently the standard library supports 16 different escaping functions and it goes through 24 different possible valid states while parsing the templates and still has a couple of bugs that might lead to XSS in very peculiar situations [`[1]`](https://github.com/golang/go/issues/19669) [`[2]`](https://github.com/golang/go/issues/9200). I advise against trying to do this by hand or re-implementing this logic.
 
-Moreover all open-source libraries that I reviewed in the wild for Go and Rust **do not** perform contextual auto-escaping so keep in mind that if you want to use a template that is not `html/template` you are putting yourself at risk as they will just escape everything as HTML. Stick to the standard library and stay safe!
+Moreover all widespread open-source libraries that I found in the wild for Go and Rust **do not** perform contextual auto-escaping so keep in mind that if you want to use a template that is not `html/template` you are putting yourself at risk as they will just escape everything as HTML. Stick to the standard library and stay safe!
 
 > Note: in the near future Google is planning to open-source [another Go library](https://github.com/golang/go/issues/27926) that grants an even better level of protection against XSS, but it hasn't been released yet.
 
@@ -159,7 +177,9 @@ If you want to secure you application from XSS you should:
 
 Trusted Types are client side, so not much for Go to do.
 
-Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"`.
+For generating responses make sure you never write to an `http.ResponseWriter` with anything that is not an HTML template.
+
+Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"` and **not** `text/template` and `math/rand`.
 
 ```go
 package main
