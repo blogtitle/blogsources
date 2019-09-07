@@ -167,6 +167,8 @@ In case your application doesn't use JavaScript and you want to make sure it nev
 
 If you are going to use trusted types they will also be sent as part of your CSP.
 
+> Note: want to know more about CSP, the successes, the difficulties and the way to deploy and harden it at scale? We got you covered: a couple of engineers gave [a talk](https://www.youtube.com/watch?v=_L06HetskC4) at LocoMocoSec this year on how to do it at Google scale!
+
 ### Mitigation: Cookies scope
 Cookies should be scoped and restricted to only be sent when necessary. Moreover cookies should not be directly accessible by JavaScript. This can be achieved with the [`Domain and Path`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) and [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) attributes. This provides little mitigation against XSS but it is very simple to deploy so it is still worth the effort.
 
@@ -184,6 +186,8 @@ If you want to secure you application from XSS you should:
 * To generate responses make sure you always write to an `http.ResponseWriter` with an HTML template and nothing else. It should be easy to catch this mistake in code review but it is also quite easy to write an analyzer for it. If you want to try and write such a tool here is the [doc](https://godoc.org/golang.org/x/tools/go/analysis) and [a talk](https://www.youtube.com/watch?v=HDJE-_s3x8Q) about it. If you end up writing it, please [share it](https://staticcheck.io)!
 
 * Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"` and **not** `text/template` and `math/rand`.
+
+Let's see the code:
 
 ```go
 package main

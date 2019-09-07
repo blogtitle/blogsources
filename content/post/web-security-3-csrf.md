@@ -1,5 +1,5 @@
 ---
-title: "Rob'n Go security pearls: Cross Site Request Forgery(CSRF)"
+title: "Rob'n Go security pearls: Cross Site Request Forgery (CSRF)"
 date: 2019-09-06T16:20:23+02:00
 categories: ["Web security"]
 tags: ["web","security","golang"]
