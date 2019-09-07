@@ -77,7 +77,7 @@ This would reflect part of the input in the output without escaping, which cause
 
 In both reflected and stored XSS the culprit is a **lack of proper escaping**.
 
-If you, like me, are a developer you **don't want to care** about all the possible escaping contexts you are putting user controlled data in, you just want things to work. As I like to think about this: stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
+If you are a developer like me you **don't want to care** about all the possible escaping contexts you are putting user controlled data in, you just want things to work. Stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
 
 If you are working with Go you are lucky. The `html/template` package does contextual auto-escaping. This means that when your templates are parsed the library detects in which context you are putting strings in and it will pick a chain of escaping functions to properly encode it.
 
@@ -105,7 +105,7 @@ If you want to know more about some bypasses and advanced details about contextu
 # Client-Side (DOM based)
 If you think using the proper template will save you from XSS, you're out of luck. There is still a whole family of XSS that is waiting behind the corner to hit you and your users when you less expect it. The server might do all the escaping correctly depending on the context the strings are interpolated in but, then, the client-side code might just decide to execute arbitrary code.
 
-The Document Object Model(DOM) is a way to programmatically access and modify a webpage. JavaScript can call special functions and methods that can, during or after page load, change some things.
+The Document Object Model(DOM) is a way to programmatically access and modify a webpage. JavaScript can call special functions and methods that can, during or after page load, change something.
 
 Let's look at an example:
 
@@ -130,7 +130,7 @@ Well... It doesn't `¯\_(ツ)_/¯`.
 
 Or at least it doesn't **YET**. Proper escaping can be done with libraries like [`DOMPurify`](https://github.com/cure53/DOMPurify) and it won't get in the platform for a while so no luck there, but a way to enforce a secure access to the DOM APIs like `innerHTML` is being worked on. The idea to address the issue is to add [Trusted Types](https://github.com/WICG/trusted-types) to browsers so that only controlled strings can be used to access the DOM.
 
-This is not implemented in stable versions of browsers but it will get there fairly soon so we might eventually be able to address this mess. If you want to try them out in advance there is [a polyfill library](https://github.com/WICG/trusted-types#polyfill) ready for you to use!
+This is not available in any stable version of browsers but it will get there eventually. If you want to try them out in advance there is [a polyfill library](https://github.com/WICG/trusted-types#polyfill) ready for you to use!
 
 # Mitigations
 There are some features in the web platform that were built to help out. In the sad case in which some attacker-controlled code might end up in your HTML page there are some countermeasures that might still render the exploitation extremely hard or, sometimes, impossible. Those countermeasures help in both server-side XSS and DOM XSS, but they have limited benefit in the latter.
@@ -177,7 +177,7 @@ If you want to secure you application from XSS you should:
 
 1. Use templating engines with contextual auto-escaping ([Go standard library](https://golang.org/pkg/html/template/) or [Google closure templates](https://github.com/google/closure-templates) do it);
 1. Adopt [strict CSP](https://csp.withgoogle.com/docs/strict-csp.html);
-1. Add [Trusted Types](https://github.com/WICG/trusted-types) to your CSP whenever possible (even polyfilling should work fine) or make sure to carefully review all uses of [dangerous DOM APIs](https://wicg.github.io/trusted-types/dist/spec/#injection-sinks);
+1. Potentially add [Trusted Types](https://github.com/WICG/trusted-types) to your CSP whenever possible (even [polyfilling](https://github.com/WICG/trusted-types#polyfill) should work fine) or make sure to carefully review all uses of [dangerous DOM APIs](https://wicg.github.io/trusted-types/dist/spec/#injection-sinks);
 1. Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
 
 # Let's apply this to Go!
@@ -239,7 +239,7 @@ func genNonce() string {
 	return base64.StdEncoding.EncodeToString(b[:])
 }
 ```
-Please note that here I'm decorating only a single handler but an entire `http.ServeMux` can be protected with CSP in this exact way.
+Please note that here I'm decorating only a single handler but an entire `http.ServeMux` can be protected with CSP in the same way.
 
 Cookies attributes can be set together with cookies by using [the standard http package](https://golang.org/pkg/net/http/#Cookie).
 
