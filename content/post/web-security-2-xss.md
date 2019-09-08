@@ -90,6 +90,9 @@ A final but very important note: if your response is not HTML (e.g. JSON or plai
 For example, in Go:
 ```go
 func jsonHandler(w http.ResponseWriter, r *http.Request) {
+  // This should be set on the entire service
+  w.Header().Set("X-Content-Type-Options", "nosniff")
+  // This must be set on every JSON response
   w.Header().Set("Content-Type","application/json; charset=utf-8")
   // Write your JSON response here.
 }
@@ -168,16 +171,14 @@ This mitigation provides little protection against XSS but it is very simple to 
 If you want to secure you application from XSS you should:
 
 1. Use templating engines with contextual auto-escaping ([Go standard library](https://golang.org/pkg/html/template/) or [Google closure templates](https://github.com/google/closure-templates) do it);
-1. Appropriately set `Content-Type`, both response type and `charset`.
+1. Appropriately set [`Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Type) (both response type and `charset`) and make sure browsers [don't "sniff" the `Content-Type`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options);
 1. Adopt [strict CSP](https://csp.withgoogle.com/docs/strict-csp.html);
 1. Make sure to carefully review all uses of [dangerous DOM APIs](https://wicg.github.io/trusted-types/dist/spec/#injection-sinks), use your frameworks properly and, potentially, try out [trusted types](https://github.com/WICG/trusted-types#polyfill);
 1. Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
 
 # Let's apply this to Go!
-* Trusted Types and JavaScript frameworks are client side, so not much for Go to do, but we can work on the rest.
-
+* Trusted Types and JavaScript frameworks are client side, so not much for Go to do, but we can take a look at the rest.
 * To generate responses make sure you always write to an `http.ResponseWriter` set to `Content-Type: text/html` with an HTML template and nothing else. It should be easy to catch this mistake in code review but it is also quite easy to write an analyzer for it. If you want to try and write such a tool here is the [doc](https://godoc.org/golang.org/x/tools/go/analysis) and [a talk](https://www.youtube.com/watch?v=HDJE-_s3x8Q) about it. If you end up writing it, please [share it](https://staticcheck.io)!
-
 * Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"` and **not** `"text/template"` and `"math/rand"`.
 
 The code:
@@ -202,6 +203,7 @@ const (
 
 func protect(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 		nonce := genNonce()
 		w.Header().Set("Content-Security-Policy",
 			fmt.Sprintf(cspTpl, nonce))
@@ -233,7 +235,7 @@ func genNonce() string {
 	return base64.StdEncoding.EncodeToString(b[:])
 }
 ```
-Please note that here I'm decorating only a single handler but an entire `http.ServeMux` can be protected with CSP in the same way.
+Please note that here I'm decorating only a single handler but an entire `http.ServeMux` can be protected with CSP in the same way. Setting CSP on non-html responses will not affect your application.
 
 Cookies attributes can be set together with cookies by using [the standard http package](https://golang.org/pkg/net/http/#Cookie).
 
