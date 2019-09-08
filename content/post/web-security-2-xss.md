@@ -8,6 +8,10 @@ draft: true
 ---
 > This post is part of my developer-friendly security series. You can find all other posts [here](https://blogtitle.github.io/categories/web-security/).
 
+XSS is a vulnerability that allows attackers to run arbitrary JavaScript code in applications they shouldn't be able to control. This can lead to **complete account compromises for every victim** that follows a malicious link or visits a compromised page.
+
+There are two major families of XSS: server side and client side. Let's see how to best protect your app from them.
+
 # Server-Side XSS
 
 Most programs and web applications need to store and/or send back some data to the users. Modern web applications have hundreds of inputs and hundreds of outputs. As you might imagine sometimes developers get some escaping wrong and that is where things start going bad.
@@ -81,6 +85,17 @@ Moreover all widespread open-source libraries that I found in the wild for Go an
 
 If you want to know more about some bypasses and advanced details about contextual auto-escaping [here](https://rawgit.com/mikesamuel/sanitized-jquery-templates/trunk/safetemplate.html#problem_definition) is your poison.
 
+A final but very important note: if your response is not HTML (e.g. JSON or plain text) it is **of vital importance** that you appropriately set the Content-Type header to the correct value.
+
+For example, in Go:
+```go
+func jsonHandler(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type","application/json; charset=utf-8")
+  // Write your JSON response here.
+}
+```
+If you don't do this there are some attacks that can be performed to trick the browser into executing code from JSON or other formats.
+
 # Client-Side (DOM based) XSS
 If you think using the proper template will save you from XSS, you're out of luck. There is still a whole family of XSS that is waiting behind the corner to hit you and your users when you least expect it. The server might do all the escaping correctly depending on the context the strings are interpolated in but, then, the client-side code might just decide to execute arbitrary code.
 
@@ -153,6 +168,7 @@ This mitigation provides little protection against XSS but it is very simple to 
 If you want to secure you application from XSS you should:
 
 1. Use templating engines with contextual auto-escaping ([Go standard library](https://golang.org/pkg/html/template/) or [Google closure templates](https://github.com/google/closure-templates) do it);
+1. Appropriately set `Content-Type`, both response type and `charset`.
 1. Adopt [strict CSP](https://csp.withgoogle.com/docs/strict-csp.html);
 1. Make sure to carefully review all uses of [dangerous DOM APIs](https://wicg.github.io/trusted-types/dist/spec/#injection-sinks), use your frameworks properly and, potentially, try out [trusted types](https://github.com/WICG/trusted-types#polyfill);
 1. Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
@@ -201,6 +217,7 @@ var tpl = template.Must(template.New("hello").Parse(`
 func main() {
 	http.Handle("/", protect(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			tpl.Execute(w, map[string]interface{}{
 				"CSPNonce": r.Context().Value(cspKey),
 			})
