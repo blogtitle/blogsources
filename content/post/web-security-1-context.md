@@ -8,7 +8,7 @@ authors: ["Rob"]
 Welcome to this introductory series on web security. I'll use simple snippets and hands-on examples to introduce fundamentals on the topic.
 Most server-side code will be in Go but you'll be able to understand it if you know any C-like language.
 
-This first post is about the fundamentals: URI, HTTP, TLS, HTML and escaping. If you are already familiar with those concepts please feel free to skip to the next post.
+This first post is about the fundamentals: URI, HTTP, TLS, HTML, escaping and cookies. If you are already familiar with those concepts please feel free to skip to the next post.
 
 # It starts with a URI
 Universal Resource Identifier([URI](https://tools.ietf.org/html/rfc3986)) is something you deal with every day, whether you know about them or not. URIs are strings that commonly look like "https://github.com/empijei". Don't be fooled by the apparent simplicity of these things, they are not simple and often times can trip up experts in the field.
@@ -93,7 +93,7 @@ The cipher suite agreed in the first part determine some important algorithms, t
 * how to encrypt the traffic
 * how to check for message integrity
 
-# And it is described by HTML
+# It's described by HTML
 HyperText Markup Language(HTML) is a twisted, fuzzy derivation of XML that describes how web pages should look and behave. Over the years HTML evolved from a markup language that allowed hyperlinks to a fully blown style-markup-code descriptor.
 
 Most modern web application use HTML for structuring the page, Cascading Style Sheets(CSS) to describe its styles and JavaScript(JS) to implement logic and behaviors. Those languages can be mixed together in a single HTML page. This gets to the point where also images can be transferred inline inside HTML, with Scalable Vector Graphics(SVG) and `data` URIs.
@@ -137,7 +137,7 @@ For example when the HTML processor sees the `<style>` tag, it knows that all th
 
 This fact has the interesting consequence that in JavaScript it is impossible to have the code `var scr = "</script>";` and it is necessary to do something like `var scr = "</scr" +"ipt>";` to prevent the HTML processor from switching context. We will see the proper way to do it in a few lines.
 
-The main problem is that the HTML parser has no knowledge of the internal state of the JavaScript one, so it needs to be instructed somehow to know when it is time to resume processing tags and the JS block is finished.
+The main problem is that the HTML parser has no knowledge of the internal state of the JavaScript one, so it needs to be instructed somehow to know when it is time to resume processing tags and the JavaScript block is finished.
 
 The right way to tackle this problem is to not use HTML special characters in non-HTML blocks. All characters that might be relevant for the HTML processor need to be "escaped" somehow.
 
@@ -148,10 +148,27 @@ As you may imagine this requires some careful management by the programmer that 
 
 Stay tuned! Next post is on Cross-Site-Scripting(XSS) and will explain what happens when developers are not careful.
 
+# And can be authenticated 
+As you might have noticed, HTTP it is a stateless protocol. Roughly every time you need to fetch a resource you have to issue a new request and if you need to access some restricted endpoint you need to **authenticate again**. As you can imagine this would cause some degradation in user experience, so the platform provides some ways to get around the problem.
+
+Cookies are a built-in mechanism: whenever a server response contains a `Set-Cookie` header the browser will store the value in a so-called jar. From that moment on and until the cookie expires the browser will attach the cookie value to every request that is directed to that "endpoint" (more about this below).
+
+When a user authenticates to the server the cookie is bound to their identity and to their credentials on the server side, so that the user won't need to authenticate again.
+
+Steps of a standard authentication process:
+
+* User visits the website and might be issued a unique cookie;
+* User logs into the website with their credentials;
+* The server issues a new unique cookie and stores it in its database together with a reference to the user;
+* Every time the user agent(usually a browser) requests a resource in the scope of the cookie it also sends the cookie along;
+* When the server receives a requests it will lookup the cookie in the database and respond based on the user permissions.
+
+The server might not use a database but might decide to sign the cookie somehow to recognize the user later. Moreover some applications might use Authorization tokens instead of cookies. These are carried over different headers or in the body of the request. For the purpose of most of the following posts you don't need to pay too much attention in the difference between the two.
+
 # Recap
 If you want to send some content to a client and display it, you will have:
 
 * The content escaped as many times as many nested contexts it is sent in, no more, no less;
 * HTML sent with HTTP;
-* HTTP resource fetched over TLS over TCP;
+* HTTP, with potential authentication, fetches a resource over TLS over TCP;
 * The resource is described by a URI that needs escaping itself;

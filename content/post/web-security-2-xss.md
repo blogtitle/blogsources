@@ -8,26 +8,8 @@ draft: true
 ---
 > This post is part of my developer-friendly security series. You can find all other posts [here](https://blogtitle.github.io/categories/web-security/).
 
-# Preface: authentication
-In [the previous post](https://blogtitle.github.io/robn-go-security-pearls-fundamentals/) I briefly described how HTTP works and, as you might have noticed, it is a stateless protocol. Roughly every time you need to fetch a resource you have to issue a new request and if you need to access some restricted endpoint you need to **authenticate again**. As you can imagine this would cause some degradation in user experience, so the platform provides some ways to get around the problem.
+# Server-Side XSS
 
-Cookies are a built-in mechanism: whenever a server response contains a `Set-Cookie` header the browser will store the value in a so-called jar. From that moment on and until the cookie expires the browser will attach the cookie value to every request that is directed to that "endpoint" (more about this below).
-
-When a user authenticates to the server the cookie is bound to their identity and to their credentials on the server side, so that the user won't need to authenticate again.
-
-Steps of a standard authentication process:
-
-* User visits the website and might be issued a unique cookie;
-* User logs into the website with their credentials;
-* The server issues a new unique cookie and stores it in its database together with a reference to the user;
-* Every time the user agent(usually a browser) requests a resource in the scope of the cookie it also sends the cookie along;
-* When the server receives a requests it will lookup the cookie in the database and respond based on the user permissions.
-
-The server might not use a database but might decide to sign the cookie somehow to recognize the user later. Moreover some applications might use authorization tokens instead of cookies. For the purpose of this post you can just assume that the JavaScript code running in a web application where the user is authenticated can do everything the user could. This is either because the requests are automatically authenticated via cookies or because JavaScript is always able to access and use the authentication token.
-
-This means that **developers have to be very careful with which code they allow to execute** in the context of their applications.
-
-# Enter the vulnerability
 Most programs and web applications need to store and/or send back some data to the users. Modern web applications have hundreds of inputs and hundreds of outputs. As you might imagine sometimes developers get some escaping wrong and that is where things start going bad.
 
 Let's make an example, suppose you are using "text/template" to generate HTML:
@@ -56,12 +38,9 @@ Hello I'm <script>evilCode()</script> and welcome to my shop!
 ```
 In this example the `evilCode()` function is invoked.
 
-An attack scenario would be that an evil user signs up in this application, enters the malicious code as their name, and sends a link to its profile to the victim. When the victim visits the profile the name of the attacker is improperly interpolated in the page and evil code is executed. This will cause the application to **perform actions in the name of the victim without them knowing**.
+An attack scenario would be that an evil user signs up in this application, enters the malicious code as their name, and sends a link to their profile to the victim. When the victim visits the profile the name of the attacker is improperly interpolated in the page and evil code is executed. This will cause the application to **perform actions in the name of the victim without them knowing**.
 
-# Server-Side XSS
-The example above is an instance of server-side XSS because the interpolation happens on the server. To be more specific this is a case of stored XSS as it persists in the database of the application.
-
-Some XSS might only trigger when interpolating data from the request into the response, and those are called reflected XSS. One example of reflected XSS in Go would be:
+The example above is an instance of _stored XSS_ as it persists in the database of the application. Some other server-side XSS might only trigger when interpolating data from the request into the response, and those are called _reflected XSS_. One example in Go would be:
 ```go
 func vulnerableHandler(w http.ResponseWriter, r *http.Request) {
   r.ParseForm()
@@ -72,13 +51,14 @@ func vulnerableHandler(w http.ResponseWriter, r *http.Request) {
   //...
 }
 ```
-This would reflect part of the input in the output without escaping, which causes XSS (you should never use `fmt` to write to an HTTP response).
+This would reflect part of the input in the output without escaping, which causes XSS (you should **never** use `fmt` to write to a HTTP response).
 
 In both reflected and stored XSS the culprit is a **lack of proper escaping**.
 
 If you are a developer like me you **don't want to care** about all the possible escaping contexts you are putting user controlled data in, you just want things to work. Stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
 
-If you are working with Go you are lucky. The `html/template` package does contextual auto-escaping. This means that when your templates are parsed the library detects in which context you are putting strings in and it will pick a chain of escaping functions to properly encode it.
+### A solution
+If you are working with Go you are lucky. The `html/template` package performs contextual auto-escaping. This means that when your templates are parsed the library detects in which context you are putting strings in and it will pick a chain of escaping functions to properly encode it.
 
 If you are interpolating, for example, in this context:
 ```html
@@ -93,7 +73,7 @@ This will automatically be encoded in a way that an attacker could not break. Th
 
 If the first escaping wouldn't have been performed a string like `"; evilCode(); var b = "` would have executed `evilCode`.
 
-This might seem trivial but there are some complicated cases where escaping might not be intuitive, like inside `style` blocks or HTML attributes (where escaping depends on the attribute key). Currently the standard library supports 16 different escaping functions and it goes through 24 different possible valid states and contexts while parsing the templates. It is very well designed and has only very minor known issues. I advise against trying to do this by hand or re-implementing this logic yourself. For Go 1.13 as long as you don't interpolate data in [a html tag name](https://github.com/golang/go/issues/19669)(and why would you?) or [a JavaScript template literal](https://github.com/golang/go/issues/9200)(you shouldn't use two templates together anyways) your app should be in a pretty good shape.
+This might seem trivial but there are some complicated cases where escaping might not be intuitive, like inside `style` blocks or HTML attributes (where escaping depends on the attribute key). Currently the standard library supports 16 different escaping functions and it goes through 24 different possible valid states and contexts while parsing the templates. It is very well designed and has only very minor known issues. **I advise against trying to do this by hand or re-implementing this logic yourself**. For Go 1.13 as long as you don't interpolate data in [a html tag name](https://github.com/golang/go/issues/19669) (and why would you?) or [a JavaScript template literal](https://github.com/golang/go/issues/9200) (you shouldn't use two templates together anyways) your app should be in a pretty good shape.
 
 Moreover all widespread open-source libraries that I found in the wild for Go and Rust **do not** perform contextual auto-escaping so keep in mind that if you want to use a template that is not `html/template` **you are putting yourself at risk**. On this topic I can only suggest to stick to the standard library to stay safe.
 
@@ -101,7 +81,7 @@ Moreover all widespread open-source libraries that I found in the wild for Go an
 
 If you want to know more about some bypasses and advanced details about contextual auto-escaping [here](https://rawgit.com/mikesamuel/sanitized-jquery-templates/trunk/safetemplate.html#problem_definition) is your poison.
 
-# Client-Side (DOM based)
+# Client-Side (DOM based) XSS
 If you think using the proper template will save you from XSS, you're out of luck. There is still a whole family of XSS that is waiting behind the corner to hit you and your users when you least expect it. The server might do all the escaping correctly depending on the context the strings are interpolated in but, then, the client-side code might just decide to execute arbitrary code.
 
 The Document Object Model(DOM) is a way to programmatically access and modify a webpage. JavaScript can call special functions and methods that can, during or after page load, change something.
@@ -119,7 +99,7 @@ If the current page URI ends with `#<img%20src=x%20onerror="alert(1)"/>` this co
 
 `https://vulnerable.com/#<img%20src=x%20onerror="evilCode()"/>`
 
-and if the user clicks on it the attacker executes `evilCode` in their session.
+and if the user clicks on it the attacker executes `evilCode` in their browser, in the context of the vulnerable application.
 
 As you can see no server-side code was involved. This is true to the point where the "frame" part of a URI (the string after and including the first `#` character) **is not even sent to the server**.
 
@@ -127,10 +107,10 @@ As a developer you might want to protect against this kind of vulnerability and 
 
 Well... It doesn't `¯\_(ツ)_/¯`.
 
-That said something can still be done: proper escaping can be performed with libraries like [`DOMPurify`](https://github.com/cure53/DOMPurify) and a way to enforce a secure access to the DOM APIs like `innerHTML` is being worked on with trusted types. If you want to experiment with something new there is a [a polyfill library](https://github.com/WICG/trusted-types#polyfill) ready for you to use. Moreover, if you use a major framework like [Angular](https://angular.io/guide/security#xss) or [React](https://reactjs.org/docs/dom-elements.html#dangerouslysetinnerhtml), I also suggest to consult their user guides on XSS prevention.
+That said something can still be done: proper escaping can be performed with libraries like [`DOMPurify`](https://github.com/cure53/DOMPurify) and a way to enforce a secure access to the DOM APIs like `innerHTML` is being worked on with [trusted types](https://github.com/WICG/trusted-types#polyfill). If you want to experiment with something new there is a [a polyfill library](https://github.com/WICG/trusted-types#polyfill) ready for you to use. Moreover, if you use a major framework like [Angular](https://angular.io/guide/security#xss) or [React](https://reactjs.org/docs/dom-elements.html#dangerouslysetinnerhtml), I also suggest to consult their user guides on XSS prevention.
 
 # Mitigations
-There are some features in the web platform that were built to help out. In the sad case in which some attacker-controlled code might end up in your HTML page there are some countermeasures that might still render the exploitation extremely hard or, sometimes, impossible. Those countermeasures help in both server-side XSS and DOM XSS, but they have limited benefit in the latter.
+There are some features in the web platform that were built to help out. In the sad case in which some attacker-controlled code might end up in your HTML page there are some countermeasures that might still render the exploitation extremely hard or, sometimes, impossible. Those countermeasures help in both server-side XSS and DOM XSS, but they might have limited benefits in the latter.
 
 ### Mitigation: Content Security Policy
 Content Security Policy (CSP) allows developers to declare which scripts they trust so that the browser will refuse to execute any other code. Let's see an example of HTTP HTML response protected with strict CSP:
@@ -162,12 +142,12 @@ In case your application doesn't use JavaScript and you want to make sure it nev
 
 `Content-Security-Policy: base-uri 'none'; object-src 'none'; script-src 'none';`
 
-If you are going to use trusted types they will also be sent as part of your CSP.
-
-> Note: want to know more about CSP, the successes, the difficulties and the way to deploy and harden it at scale? We got you covered: a couple of engineers gave [a talk](https://www.youtube.com/watch?v=_L06HetskC4) at LocoMocoSec this year on how to do it at Google scale!
+> Note: want to know more about CSP, the successes, the difficulties and the way to deploy and harden it at scale? We got you covered: a couple of engineers in my team gave [a talk](https://www.youtube.com/watch?v=_L06HetskC4) at LocoMocoSec this year on how to do it at Google scale!
 
 ### Mitigation: Cookies scope
-Cookies should be scoped and restricted to only be sent when necessary. Moreover cookies should not be directly accessible by JavaScript. This can be achieved with the [`Domain and Path`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) and [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) attributes. This provides little mitigation against XSS but it is very simple to deploy so it is still worth the effort.
+Cookies should be scoped and restricted to only be sent when necessary. In addition to that cookies should not be directly accessible by JavaScript. This can be achieved with the [`Domain and Path`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) and [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) attributes.
+
+This mitigation provides little protection against XSS but it is very simple to deploy so it is still worth the effort.
 
 # Recap
 If you want to secure you application from XSS you should:
@@ -178,13 +158,13 @@ If you want to secure you application from XSS you should:
 1. Set your cookies as [`HttpOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Secure_and_HttpOnly_cookies) and [scope them](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#Scope_of_cookies) so that only the endpoints that need them receive them.
 
 # Let's apply this to Go!
-* Trusted Types are client side, so not much for Go to do, but we can work on the rest.
+* Trusted Types and JavaScript frameworks are client side, so not much for Go to do, but we can work on the rest.
 
-* To generate responses make sure you always write to an `http.ResponseWriter` with an HTML template and nothing else. It should be easy to catch this mistake in code review but it is also quite easy to write an analyzer for it. If you want to try and write such a tool here is the [doc](https://godoc.org/golang.org/x/tools/go/analysis) and [a talk](https://www.youtube.com/watch?v=HDJE-_s3x8Q) about it. If you end up writing it, please [share it](https://staticcheck.io)!
+* To generate responses make sure you always write to an `http.ResponseWriter` set to `Content-Type: text/html` with an HTML template and nothing else. It should be easy to catch this mistake in code review but it is also quite easy to write an analyzer for it. If you want to try and write such a tool here is the [doc](https://godoc.org/golang.org/x/tools/go/analysis) and [a talk](https://www.youtube.com/watch?v=HDJE-_s3x8Q) about it. If you end up writing it, please [share it](https://staticcheck.io)!
 
 * Strict CSP and contextual auto-escaping can be done with something like the following proof of concept. Make sure you import `"html/template"` and `"crypto/rand"` and **not** `"text/template"` and `"math/rand"`.
 
-Let's see the code:
+The code:
 
 ```go
 package main
