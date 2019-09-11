@@ -38,3 +38,13 @@ Some might argue that the browser will send a `Referer` header with that informa
 
 To prevent a site hosted on `hungry-attacker.com` from ordering pizza on `pizza-delivery.science` we need to get creative.
 
+HTTP is stateless, so we don't get information on the connection state. Browsers always add cookies to the requests based on where the request is going, not where it is coming from, so no luck there either. We can change how the web platform works, but that takes time (although something is moving). 
+
+Last resort is that we have to find a way to make sure the incoming request comes from a page that **we** generated and **from the user we generated it for**. Both requirements are important: we don't want an attacker to be able to craft a malicious page and we don't want them to use a page we generated for them as an exploit. Always keep in mind that **the attacker could also be a user** and most of the time they will be.
+
+There are several ways to approach this and they are all based on some sort of tokens. Since cryptography is involved with this protection I strongly advise against re-implementing this feature yourself. Unlike XSS protection the standard library falls short on this aspect so we have to take a look at the available ecosystem.
+
+
+// TODO maybe mention the dangers of having a non-public app non protected?
+# Same-Site Cookies
+# Fetch Metadata
