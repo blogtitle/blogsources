@@ -1,22 +1,21 @@
 ---
 title: "Rob'n Go security pearls: Cross Site Scripting (XSS)"
-date: 2019-09-05T12:30:40+02:00
+date: 2019-09-11T23:23:40+02:00
 categories: ["Web security"]
 tags: ["web","security","golang"]
 authors: ["Rob"]
-draft: true
 ---
 > This post is part of my developer-friendly security series. You can find all other posts [here](https://blogtitle.github.io/categories/web-security/).
 
 XSS is a vulnerability that allows attackers to run arbitrary JavaScript code in applications they shouldn't be able to control. This can lead to **complete account compromises for every victim** that follows a malicious link or visits a compromised page.
 
-There are two major families of XSS: server side and client side. Today we'll discover how to better protect against server-side XSS, how to reduce the risk of DOM XSS (with some novel technologies) and how to mitigate both of them with some defense-in-depth mechanisms. In the end there will be a recap (with code!) to put together the most important bits you shouldn't forget.
+There are two major families of XSS: server side and client side. Today we'll discover how to better protect against server-side XSS, how to reduce the risk of client-side XSS (with some novel technologies) and how to mitigate both of them with some defense-in-depth mechanisms. In the end there will be a recap (with code!) to put together the most important bits you shouldn't forget.
 
 # Server-Side XSS
 
 Most programs and web applications need to store and/or send back some data to the users. Modern web applications have hundreds of inputs and hundreds of outputs. As you might imagine sometimes developers get some escaping wrong and that is where things start going bad.
 
-Let's make an example, suppose you are using "text/template" to generate HTML:
+Let's make an example, suppose you are using "text/template" to generate pages:
 
 ```html
 <div>
@@ -97,7 +96,7 @@ func jsonHandler(w http.ResponseWriter, r *http.Request) {
   // Write your JSON response here.
 }
 ```
-If you don't do this there are some attacks that can be performed to trick the browser into executing code from JSON or other formats.
+If you don't do this there are some attacks that can be performed to trick the browser into executing code from non-HTML responses.
 
 # Client-Side (DOM based) XSS
 If you think using the proper template will save you from XSS, you're out of luck. There is still a whole family of XSS that is waiting behind the corner to hit you and your users when you least expect it. The server might do all the escaping correctly depending on the context the strings are interpolated in but, then, the client-side code might just decide to execute arbitrary code.
