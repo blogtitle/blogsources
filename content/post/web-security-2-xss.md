@@ -10,7 +10,7 @@ draft: true
 
 XSS is a vulnerability that allows attackers to run arbitrary JavaScript code in applications they shouldn't be able to control. This can lead to **complete account compromises for every victim** that follows a malicious link or visits a compromised page.
 
-There are two major families of XSS: server side and client side. Let's see how to best protect your app from them.
+There are two major families of XSS: server side and client side. Today we'll discover how to better protect against server-side XSS, how to reduce the risk of DOM XSS (with some novel technologies) and how to mitigate both of them with some defense-in-depth mechanisms. In the end there will be a recap (with code!) to put together the most important bits you shouldn't forget.
 
 # Server-Side XSS
 
