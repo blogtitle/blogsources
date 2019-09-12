@@ -56,9 +56,13 @@ func vulnerableHandler(w http.ResponseWriter, r *http.Request) {
 ```
 This would reflect part of the input in the output without escaping, which causes XSS (you should **never** use `fmt` to write to a HTTP response).
 
-In both reflected and stored XSS the culprit is a **lack of proper escaping**.
+In both reflected and stored XSS the culprit is a **lack of proper escaping**. The way you you can think about this is that you should only be able to write trusted content to the page. Everything else would need to be "promoted" to be trusted. You can imagine text and HTML to be two different types:
+* TrustedHtml + Trusted HTML → TrustedHtml
+* TrustedHtml + escapeHtml(text) → TrustedHtml
+* TrustedHtml + sanitizeHtml(untrustedHTML) → TrustedHtml
+* TrustedHtml + text → ERROR
 
-If you are a developer like me you **don't want to care** about all the possible escaping contexts you are putting user controlled data in, you just want things to work. Stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
+If you are a developer like me you **don't want to care** about all the possible escaping contexts and steps you have to go through, you just want things to work. Stuff should be secure by default and not require the developers to care about it. Libraries should be close to impossible to use wrong.
 
 ### A solution
 If you are working with Go you are lucky. The `html/template` package performs contextual auto-escaping. This means that when your templates are parsed the library detects in which context you are putting strings in and it will pick a chain of escaping functions to properly encode it.
