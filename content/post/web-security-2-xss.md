@@ -57,6 +57,7 @@ func vulnerableHandler(w http.ResponseWriter, r *http.Request) {
 This would reflect part of the input in the output without escaping, which causes XSS (you should **never** use `fmt` to write to a HTTP response).
 
 In both reflected and stored XSS the culprit is a **lack of proper escaping**. The way you you can think about this is that you should only be able to write trusted content to the page. Everything else would need to be "promoted" to be trusted. You can imagine text and HTML to be two different types:
+
 * TrustedHtml + Trusted HTML → TrustedHtml
 * TrustedHtml + escapeHtml(text) → TrustedHtml
 * TrustedHtml + sanitizeHtml(untrustedHTML) → TrustedHtml
