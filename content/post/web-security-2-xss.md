@@ -113,7 +113,7 @@ Let's look at an example:
 ```html
 <script>
 var mydiv = document.getElementById("myDiv");
-mydiv.innerHTML = window.location.hash;
+mydiv.innerHTML = decodeURI(window.location.hash);
 </script>
 ```
 
