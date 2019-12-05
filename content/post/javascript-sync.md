@@ -117,7 +117,7 @@ WaitGroup is normally used to wait until all workers are done with their job and
 * Calling `done` on a WaitGroup is equivalent to calling `add(-1)`
 * Calling `wait` on a WaitGroup should suspend execution until the counter is equal to `0`
 
-Beware that `add` should always be called **before the work is tarted**, and this is why I added an initial value in the constructor. Calling `add` in the worker that calls `done` causes race conditions and might result in undesired early returns from `wait`.
+Beware that `add` should always be called **before the work is started**, and this is why I added an initial value in the constructor. Calling `add` in the worker that calls `done` causes race conditions and might result in undesired early returns from `wait`.
 
 To implement it I used the following primitives:
 
