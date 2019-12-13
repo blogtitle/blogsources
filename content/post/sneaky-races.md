@@ -2,9 +2,8 @@
 title: "Sneaky race conditions and granular locks"
 date: 2019-12-11T09:33:58+01:00
 categories: ["Go", "Concurrency"]
-tags: ["golang", "concurrency", "patterns", "engineering"]
+tags: ["golang", "rust", "concurrency", "patterns", "engineering"]
 authors: ["Rob"]
-draft: true
 ---
 
 Race conditions are the main problem you have to care about when writing concurrent code. Go provides high level primitives that make it easier to get concurrency and parallelism right, but those are often times not enough.
@@ -131,11 +130,25 @@ What makes it even worse is **how hard it is to spot**, especially for people th
 # Conclusion
 Resist the temptation of hiding away your synchronization primitives as much as possible.
 
-If you have to encapsulate, do not copy around values that should be protected by a lock, pass pointers to them. This will make the race detector and Rust scream at you if you access them without synchronization. Using a pointer hints the users, the runtime and the compiler that you assume a value is only present and valid **once** in memory. All copies are by default assumed to be stale.
-
-Moreover, if you have to encapsulate make sure to provide at least one Read-Modify-Write primitive like `Add` or `CompareAndSwap`. You should do this **as soon as you encapsulate**, not when needed.
+If you **have to encapsulate** make sure to provide at least one Read-Modify-Write primitive like `Add` or `CompareAndSwap`. You should do this **as soon as you encapsulate**, not when needed.
 The sole presence of those methods will tip off your users that your type must be used as an atomic one.
 
-Finally: **document how your code should be used and under which assumptions it works**. Do not make me read your code to see if you getter is doing something I should know about.
+Finally: **document how your code should be used and under which assumptions it works**. Do not make  your users read the code to see if you getter is doing something they should know about.
 
+### Can we make better tools?
 
+I think so, especially at runtime (the Go approach): when running code with `go test -race` the compiler could change the behavior of the code to **force rescheduling points on synchronization calls**. As far as I know Rust does not currently have this level of control on threads or a builtin race detector.
+
+One example of this would be that every time a mutex is released during testing a call into the scheduler would be performed. This would make the races described in this post much more likely to happen and would not affect correct code.
+
+As [Dmitry Vyukov points out](https://twitter.com/dvyukov/status/1205382645405954048?s=20), go already does [something similar](https://github.com/golang/go/blob/0497f911acbb33efbeac7271dc46e920fe26f4b8/src/runtime/proc.go#L4932-L4941) but this is not enough as it doesn't influence where scheduling points are emitted by the compiler, only the scheduler order.
+
+Adding such a change would make incorrect code much more likely to not pass tests, which would at least be a good starting point.
+
+# Want to know more?
+
+[Here](https://blog.golang.org/race-detector) is an official post on the race detector.
+
+[Here](https://doc.rust-lang.org/nomicon/races.html) is documentation on what is a race condition for Rust safety model.
+
+[Here](http://www.1024cores.net/) is a blog on lock-free programming: the most extreme form of granular synchronization.
