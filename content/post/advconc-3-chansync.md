@@ -37,7 +37,7 @@ func NewOnce() Once {
 
 func (o Once) Do(f func()) {
 	// Read from a closed chan always succeedes.
-  // This only blocks during initialization.
+	// This only blocks during initialization.
 	_, ok := <-o
 	if !ok {
 		// Channel is closed, early return.
