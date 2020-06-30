@@ -27,14 +27,14 @@ Moreover "html/template" has some standing issues that don't have a good way to 
 Note that I am maintaining "html/template" (I'm empijei [here](https://dev.golang.org/owners)), so I am telling you this with a bit of background of being bitten by that package. If I could magically migrate all users to the safe version I would.
 
 # The structure
-Safehtml is composed of several packages. Depending on your buildsystem or your company toolchain there are some constraint that you should enforce. Your company's security team or security-aware folks should be setting this up for everyone.
+Safehtml is composed of several packages. Depending on your build system or your company toolchain there are some constraint that you should enforce. Your company's security team or security-aware folks should be setting this up for everyone.
 
 ### safehtml
 This is the root package and it is just providing types that are [safe by construction](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/42934.pdf). Here is how it works in a nutshell:
 
 * There are only 3 ways to construct the [HTML type](https://godoc.org/github.com/google/safehtml#HTML):
   * [by escaping an untrusted string](https://godoc.org/github.com/google/safehtml#HTMLEscaped), making it safe to use
-  * [by rendering a safe template](https://godoc.org/github.com/google/safehtml/template#Template.ExecuteToHTML), which uses contextual autoescaping, so it is safe (you can read more about this [in a previous post of mine](https://blogtitle.github.io/robn-go-security-pearls-cross-site-scripting-xss/))
+  * [by rendering a safe template](https://godoc.org/github.com/google/safehtml/template#Template.ExecuteToHTML), which uses contextual auto-escaping, so it is safe (you can read more about this [in a previous post of mine](https://blogtitle.github.io/robn-go-security-pearls-cross-site-scripting-xss/))
   * [by concatenating already trusted HTML](https://godoc.org/github.com/google/safehtml#HTMLConcat), which is mostly safe and practically requires bad intention to get wrong.
 
 This guarantees that every single instance of the HTML type is known to be safe, because there is no unsafe way to construct it. The [Script type](https://godoc.org/github.com/google/safehtml#Script) behaves similarly but instead of having templates it can only be built from constants or data. To express the concept of "compile time constant" it has [constructors that take unexported string types](https://godoc.org/github.com/google/safehtml#ScriptFromConstant), so the only way to call them is with a [string literal](https://golang.org/ref/spec#String_literals) (I find this to be a very neat trick).
@@ -68,7 +68,7 @@ Usages of this package are your single point of failure, so make sure you only u
 One example of a correct use of this package would be for the output of a sanitizer. If you need to have some HTML that your users provide to be embedded in a response (e.g. because you render markdown or you have a webmail) you will sanitize that HTML. Once it is sanitized (if your sanitizer is correctly implemented) it should be okay to use an unchecked conversion to promote it to the HTML type.
 
 # How to do the refactor
-### Printf and nested templates
+### `Printf` and nested templates
 One example of code that you might have is
 ```go
 var theLink template.HTML = fmt.Sprintf("<a href=%q>the link</a>", myLink)
@@ -89,7 +89,7 @@ t := template.Must(template.New("outer").Parse(outer))
 t = template.Must(t.New("inner").Parse(inner))
 t.ExecuteTemplate(os.Stdout, "outer", map[string]string{"URL": myLink})
 ```
-### Const
+### Constants
 If you have an HTML `const` in your code, you can just use it as a template and execute it to html. This will check that all tags are balanced and other things and return an instance of the HTML type.
 
 So this
@@ -106,17 +106,17 @@ myHtml := template.Must(
 
 # The checklist
 1. Block access to some packages:
- * Prevent packages outside of the "safehtml" directory from importing "raw", "uncheckedconversion" and "safehtmlutil"
+ * Prevent packages outside of the "safehtml" directory from importing "raw", "uncheckedconversions" and "safehtmlutil"
  * Only allow test builds to import the "testconversions" package.
-1. Migrate away from "html/template" and replace it with "safehtml/template"
- * For every breakage or every issue, use a "legacyconversion". Some manual refactoring might be needed, but migration should be fairly straightforward
+2. Migrate away from "html/template" and replace it with "safehtml/template"
+ * For every breakage or every issue, use a "legacyconversions" call. Some manual refactoring might be needed, but migration should be fairly straightforward
  * RUN ALL YOUR INTEGRATION AND E2E TESTS. This is *important*, so important I used SHIFT and not CAPS to type it
- * Block down the list of legacy conversions: from this moment on new imports of the "legacyconversion" package are forbidden
+ * Block down the list of legacy conversions: from this moment on new imports of the "legacyconversions" package are forbidden
  * Ban use of "html/template", so that all new code is safe
-1. Refactor legacy conversions to use safe patterns
+3. Refactor legacy conversions to use safe patterns
  * Wherever possible construct HTML in a safe way and remove the legacy conversions
- * Where it is not possible use unchecked conversions. Every new import of the "uncheckedconversion" package should be reviewed.
+ * Where it is not possible use unchecked conversions. Every new import of the "uncheckedconversions" package should be reviewed.
 
 # Conclusions
-If you want to make sure you don't have server-side XSS in your Go code this probably is the best way to do so. If you have any questions or need more refactoring examples please let me know, you can contact me [here](https://twitter.com/empijei).
+If you want to make sure you don't have server-side XSS in your Go code this probably is the best way to do so. If you have any questions or need more refactoring examples please let me know, you can contact me [on twitter](https://twitter.com/empijei) (direct messages are open) or [via email](mailto:empijei@gmail.com).
 
