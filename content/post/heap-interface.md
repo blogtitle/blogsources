@@ -1,7 +1,7 @@
 ---
 title: "Go Heap Interface"
 date: 2019-10-12T18:17:01+02:00
-categories: ["Go", "Software Engineering"]
+categories: ["Go", "Software engineering"]
 tags: ["golang", "interfaces"]
 authors: ["Rob"]
 draft: true
