@@ -98,10 +98,7 @@ var myHtml template.HTML := `<h1> This is a title </h1>`
 ```
 becomes this
 ```go
-myHtml := template.Must(
-    template.New("foo")
-    .Parse(`<h1> This is a title </h1>`))
-  .ExecuteToHtml()
+myHtml := template.MustParseAndExecuteToHTML(`<h1> This is a title </h1>`)
 ```
 
 # The checklist
