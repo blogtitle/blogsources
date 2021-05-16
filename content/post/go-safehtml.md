@@ -4,7 +4,6 @@ date: 2020-06-30T13:03:31+02:00
 categories: ["Software engineering", "Security", "Go"]
 tags: ["go", "golang", "security"]
 authors: ["Rob"]
-draft: true
 ---
 
 > Disclaimer: this is not an official Google post or communication, it is just me commenting on something that is now available.
