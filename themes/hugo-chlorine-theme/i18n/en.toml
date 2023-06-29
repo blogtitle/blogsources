@@ -1,0 +1,17 @@
+[footerRSS]
+other = "RSS feed"
+
+[siteNotice]
+other = "Site notice"
+
+[categories]
+other = "Categories"
+
+[tags]
+other = "Tags"
+
+[authors]
+other = "Authors"
+
+[errorMessage]
+other = "Here is nothing."

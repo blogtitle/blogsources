@@ -1,0 +1,41 @@
+{{ partial "header.html" . }}
+
+<main class="content" role="main">
+  <article class="article">
+    <h1 class="article-title">{{ .Title }}</h1>
+    {{ if eq .Section "post" }}
+				<div class="article-header">
+    <span class="article-header">{{ .Date.Format "2006-01-02" }}</span>
+						{{ if .Params.authors }}
+						  - 
+								{{ range $index, $author := .Params.authors }}
+								{{ if gt $index 0 }}
+								{{ end}}
+								<a class="article-header" href="{{ "authors/" | relURL }}{{ . | urlize }}">{{ $author }}
+								</a>
+								{{ end }}
+						{{ end }}
+				</div>
+    {{ end }}
+
+    <div class="article-content">
+      {{ .Content }}
+    </div>
+ 
+    <ul class="article-taxonomy">
+      {{ if .Params.categories }}            
+      <hr>
+      <li>
+        <i class="fa fa-category"></i>{{ range $index, $category := .Params.categories }}{{ if gt $index 0 }}{{ end }}<a href="{{ "categories/" | relURL }}{{ . | urlize }}">{{ . }}</a>{{ end }}
+      </li>
+      {{ end }}
+    
+      {{ if .Params.tags }}
+      <li>
+        <i class="fa fa-tags"></i>{{ range $index, $tag := .Params.tags }}{{ if gt $index 0 }}{{ end }}<a href="{{ "tags/" | relURL }}{{ . | urlize }}">{{ . }}</a>{{ end }}
+      </li>
+      {{ end }}
+  </article>
+</main>
+
+{{ partial "footer.html" . }}

@@ -1,0 +1,57 @@
+baseurl = "https://example.org/"
+languageCode = "en-us"
+title = "Chlorine Theme"
+theme = "hugo-chlorine-theme"
+preserveTaxonomyNames = true
+rssLimit = 10
+paginate = 10
+pygmentsCodefences = true
+pygmentsStyle = "native"
+
+[taxonomies]
+    category = "categories"  
+    tag = "tags"
+    author = "authors"
+
+[permalinks]
+    post = "/:slug/"
+    page = "/:slug/"
+
+[[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = -110
+    
+[[menu.main]]
+    name = "Tags"
+    url = "/tags"
+    weight = -120
+
+[[menu.main]]
+    name = "Categories"
+    url = "/categories"
+    weight = -130
+
+[[menu.main]]
+    name = "Authors"
+    url = "/authors"
+    weight = -140
+
+[params]
+    description = ""
+
+    [params.logo]
+    url = "clorine.png"
+    width = 50
+    height = 50
+    alt = "Logo"
+
+    [params.authors.mickey]
+    id = "mickey"
+    firstName = "Mickey"
+    lastName = "Mouse"
+
+    [params.authors.donald]
+    id = "donald"
+    firstName = "Donald"
+    lastName = "Duck"
