@@ -1,8 +1,0 @@
-[submodule "themes/hugo-chlorine-theme"]
-	path = themes/hugo-chlorine-theme
-	url = https://github.com/empijei/hugo-chlorine-theme.git
-	branch = master
-[submodule "public"]
-	path = public
-	url = git@github.com:blogtitle/blogtitle.github.io.git
-	branch = master
