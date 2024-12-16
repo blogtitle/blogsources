@@ -6,14 +6,26 @@ tags: ["golang", "concurrency", "patterns", "engineering"]
 authors: ["Rob"]
 ---
 
+# Edit (16 Dec 2024)
+
+This post is still here for historical reasons, but it's now quite old.
+
+The sync package has evolved since then and some primitives have become available.
+
+While all the channel and select semantics have stayed the same, please consider this as a
+post on how to better understand channels semantics rather than documentation or replacement
+for the [sync](https://pkg.go.dev/sync) package.
+
+# Previous Post
+
 Today I'm going to dive into the expressive power of Go channels and the `select` statement. To demonstrate how much can be implemented with just those two primitives I will rewrite the `sync` package from scratch.
 
 In doing so I'm just going to accept some compromises:
 
-* This post is about expressive power, not speed. The examples will correctly express the primitives but might not be as fast as the real ones.
-* Channels, unlike slices, don't have a fixed size equivalent type. While you can have a `[4]int` type in Go you can't have a `chan int` of size 4, so I won't have valid zero values and all types will require a constructor call. There is [a proposal open](https://github.com/golang/go/issues/28366) to address this issue but this is beyond the scope of this post.
-* Most types will be just channels but nothing prevents you from hiding those channels in an opaque struct to avoid misuse. Since this is a blogpost and not an actual library I'm going to use bare channels for brevity and clarity.
-* I will not explain what the primitives are supposed to do but I'll link to their official doc.
+- This post is about expressive power, not speed. The examples will correctly express the primitives but might not be as fast as the real ones.
+- Channels, unlike slices, don't have a fixed size equivalent type. While you can have a `[4]int` type in Go you can't have a `chan int` of size 4, so I won't have valid zero values and all types will require a constructor call. There is [a proposal open](https://github.com/golang/go/issues/28366) to address this issue but this is beyond the scope of this post.
+- Most types will be just channels but nothing prevents you from hiding those channels in an opaque struct to avoid misuse. Since this is a blogpost and not an actual library I'm going to use bare channels for brevity and clarity.
+- I will not explain what the primitives are supposed to do but I'll link to their official doc.
 
 That said, let's start!
 
@@ -57,8 +69,8 @@ func (o Once) Do(f func()) {
 
 For [Mutex](https://golang.org/pkg/sync/#Mutex) I'm going to make two little digressions:
 
-* A Semaphore of size N allows at most N goroutines to hold its lock at any given time. Mutexes are special cases of Semaphores of size 1.
-* Mutexes might benefit from a `TryLock` method
+- A Semaphore of size N allows at most N goroutines to hold its lock at any given time. Mutexes are special cases of Semaphores of size 1.
+- Mutexes might benefit from a `TryLock` method
 
 The `sync` package does not provide semaphores or triable locks but since we are trying to prove the expressive power of channels and `select` let's implement both.
 
@@ -200,6 +212,7 @@ func (l RWMutex) TryRLock() bool {
 ```
 
 # Pool
+
 [Pool](https://golang.org/pkg/sync/#Pool) is used to relieve stress on the garbage collector and re-use objects that are frequently allocated and destroyed.
 
 The standard library uses many techniques for this: thread local storage; removing oversized objects and generations to make objects survive in the pool only if they are used between two garbage collections.
@@ -253,6 +266,7 @@ func (p *Pool) Put(x Item) {
 ```
 
 One example usage of this would be:
+
 ```go
 	p := NewPool(1024,
 		func() interface{} {
@@ -264,6 +278,7 @@ One example usage of this would be:
 ```
 
 # Map
+
 [Map](https://golang.org/pkg/sync/#Map) is not very interesting for this post as it is semantically equivalent to a `map` with a `RWMutex` on it. The `Map` type is basically a dictionary optimized for use cases that foresee to have many more reads than writes. It is just a technique to make some specific use cases faster and I will thus skip it as today we don't care about speed.
 
 # WaitGroup
@@ -277,9 +292,9 @@ One little known feature is that wait groups can be re-used: `Add` can still be 
 
 This means we have a sort of "generation" for each given wait group:
 
-* a generation begins when the counter moves from 0 to a positive number
-* a generation ends when the counter reaches 0
-* when a generation ends all waiters of that generation are unblocked.
+- a generation begins when the counter moves from 0 to a positive number
+- a generation ends when the counter reaches 0
+- when a generation ends all waiters of that generation are unblocked.
 
 Let's see it in code:
 
@@ -349,6 +364,7 @@ func (wg WaitGroup) Wait() {
 ```
 
 # Condition
+
 [Cond](https://golang.org/pkg/sync/#Cond) is the most controversial type in the sync package. I think it's a dangerous primitive and it is too easy to use incorrectly. I never use it because I don't trust myself to use it right and during code review I always suggest to use other primitives instead.
 Even Bryan Mills (who is in the Go team and works a lot on `sync` primitives) got to the point of [proposing to remove it](https://github.com/golang/go/issues/21165).
 
@@ -437,11 +453,11 @@ func (c Cond) Wait() {
 ```
 
 # Conclusion
+
 Go channels and `select` combined are extremely expressive and allow to create high level synchronization and orchestration primitives in a very expressive way. I think many of the design choices, like having limited size channels or selects that can receive and send at the same time, give Go builtin types something that is rarely seen in other languages.
 
 # Want to learn more?
 
-* [Here](https://blogtitle.github.io/categories/concurrency/) you can find my other posts on advanced concurrency.
+- [Here](https://blogtitle.github.io/categories/concurrency/) you can find my other posts on advanced concurrency.
 
-* [Here](https://drive.google.com/file/d/1nPdvhB0PutEJzdCq5ms6UI58dp50fcAN/view) you can find a very interesting presentation on rethinking concurrency patterns by Bryan Mills.
-
+- [Here](https://drive.google.com/file/d/1nPdvhB0PutEJzdCq5ms6UI58dp50fcAN/view) you can find a very interesting presentation on rethinking concurrency patterns by Bryan Mills.
