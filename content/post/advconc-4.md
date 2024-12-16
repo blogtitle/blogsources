@@ -4,6 +4,7 @@ date: 2024-12-16T22:19:23+01:00
 categories: ["Go", "Concurrency"]
 tags: ["golang", "concurrency", "patterns", "engineering"]
 authors: ["Rob"]
+draft: true
 ---
 
 # Preface
