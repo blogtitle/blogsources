@@ -4,14 +4,14 @@ date: 2024-12-16T22:19:23+01:00
 categories: ["Go", "Concurrency"]
 tags: ["golang", "concurrency", "patterns", "engineering"]
 authors: ["Rob"]
-draft: true
 ---
 
 # Preface
 
-It's been almost 6 years since I added to this series, but I thought it was time.
+It's been almost 6 years since I added to this series, but I thought it was time
+to resume working on it.
 
-Since "perfect is the opposite of done" I thought I would touch on a simple pattern
+Since "perfect is the opposite of done" I thought I would talk about a simple pattern
 that I haven't covered yet.
 
 A couple of years ago I worked on [a toy library](https://pkg.go.dev/github.com/empijei/channels)
@@ -46,7 +46,7 @@ For those rare situations the following code can be used.
 The nicest API I could think of is in the form of:
 
 ```go
-func Buffer*[T any](in <-chan T) <-chan T
+func BufferChan[T any](in <-chan T) (out <-chan T)
 ```
 
 This allows us to still deal with channels without introducing iterators or things
@@ -56,36 +56,34 @@ be cancelled with `context`.
 The semantics would be:
 
 - guarantee that all values received on `in` will be emitted on `out`
-- when `in` is closed all potentially buffered values will be emitted, and then `out`
+- when `in` is closed and all potentially buffered values have been emitted `out`
   will be closed.
 
 If you are unfamiliar with the `<-chan` type declaration, in this case it means
 that this function guarantees to never _send_ on `in` and prevents its callers
-to ever _send_ on `out`.
-
-Closing a channel is a _send_ operation.
+to ever _send_ on `out` (closing a channel is a _send_ operation).
 
 ## When order doesn't matter and the operation is short-lived
 
 If producers are much faster than consumers and so `send` operations outnumber
-`receive` operations, order rarely matter.
+`receive` operations, order rarely matters.
 
-For all of those cases where operations are short lived we can use a simple solution:
+For all of those cases where operations are short lived we can use this simple solution:
 
 ```go
-func BufExcess[T any](in <-chan T) <-chan T {
+func BufShortLived[T any](in <-chan T) <-chan T {
  var buf []T
  out := make(chan T)
  go func() {
-  defer close(out)           // Close once we are done
-  for v := range in {        // Process all input
+  defer close(out)         // Close once we are done
+  for v := range in {      // Process all input
    select {
-   case out <- v:            // Try to send
-   default:                  // If we fail
-    buf = append(buf, v)     // Add to buffer
+   case out <- v:          // Try to send
+   default:                // If we fail
+    buf = append(buf, v)   // Add to buffer
    }
   }
-  for _, v := range buf {    // Input has been closed, emit buffered values.
+  for _, v := range buf {  // Input has been closed, emit buffered values.
    out <- v
   }
  }()
@@ -100,18 +98,23 @@ Since the buffer is only ever released at the end of operations, this solution m
 
 Please still consider it as it is very simple to read and test.
 
-# When order doesn't matter, but the operation lasts a while
+# When order does matter, and the operation lasts a while
 
-In this case we can't just put all the excess on the side until we are done, we
-need to consume the buffer every now and then.
+I still have to see a reasonable use case for ordered unlimited channels,
+but since there are some people, especially from other languages communities,
+that insist this is a fundamental feature to have, we might as well talk about it.
 
-When reading this code please consider that operations on `nil` channels block forever.
+_I cannot stress enough how much harder this will make your life if you use this in production code_,
+but this is a blogpost, not a cop, so you do you.
+
+When reading this code consider that operations on `nil` channels block forever.
 A `select` case with a `nil` channel is, therefore, never selected.
 
-Here `nout` will be `nil` _if and only if_ there are no buffered values to send.
+Here `nout` will be `nil` _if and only if_ there are no buffered values to send,
+otherwise it will be equal to `out`. We use it to switch on and off its `case`.
 
 ```go
-func OrderedBuf[T any](in <-chan T) <-chan T {
+func BufLongLivedOrdered[T any](in <-chan T) <-chan T {
  out := make(chan T)
  go func() {
   defer close(out)
@@ -123,7 +126,7 @@ func OrderedBuf[T any](in <-chan T) <-chan T {
   for in != nil || nout != nil { // Until both "in" and "out" have been disabled.
    select {
    case v, ok := <-in: // If we receive
-    if !ok {           // And "in" has been closed
+    if !ok {           // and "in" has been closed
      in = nil          // disable this case.
      continue
     }
@@ -150,13 +153,16 @@ func OrderedBuf[T any](in <-chan T) <-chan T {
 What I like about this solution is that it doesn't make use of mutexes or conditions
 to protect the buffer or wake up waiters, but solely relies on channel semantics.
 
+Since only one goroutine is ever going to touch `in` and `out` we don't need to guard
+against potential race conditions.
+
 ## Improving on it
 
 One minor issue with the solution above is that we give equal priority to sending
 buffered values and receiving new values.
 
 This might, in turn, cause buffers to grow more than necessary. To avoid this, a
-preamble that is a copy of the second case can be added at the beginning of the for,
+preamble that is a copy of the second `case` can be added at the beginning of the for,
 just with a `default` to not block on it:
 
 ```go
@@ -165,7 +171,7 @@ just with a `default` to not block on it:
    case nout <- next:
     if len(queue) == 0 {
      nout = nil
-     continue
+     continue // This cannot be a break statement, we need to check the exit condition
     }
     next = queue[0]
     queue = queue[1:]
@@ -179,8 +185,68 @@ just with a `default` to not block on it:
 ```
 
 This will make the code above always try to send before it tries to both send
-and receive at once.
+and receive at once. In some rare cases this might actually reduce the buffer size.
 
-# What if order matters?
+## Full code
 
-TODO
+If you just came here for the code, here it is:
+
+```go
+func BufLongLived[T any](in <-chan T) <-chan T {
+	out := make(chan T)
+	go func() {
+		defer close(out)
+		var (
+			queue []T
+			next  T
+			nout  chan T
+		)
+		for in != nil || nout != nil {
+			select {
+			case nout <- next:
+				if len(queue) == 0 {
+					nout = nil
+                    continue
+				}
+				next = queue[0]
+				queue = queue[1:]
+				continue
+			default:
+			}
+			select {
+			case v, ok := <-in:
+				if !ok {
+					in = nil
+					continue
+				}
+				if nout == nil {
+					nout = out
+					next = v
+				} else {
+					queue = append(queue, v)
+				}
+			case nout <- next:
+				if len(queue) == 0 {
+					nout = nil
+					continue
+				}
+				next = queue[0]
+				queue = queue[1:]
+			}
+		}
+	}()
+	return out
+}
+```
+
+# Conclusions
+
+In 31 lines of code we implemented a channel operator that gives us a new ordered,
+unlimited buffer channel from an existing one.
+
+I found this quite tricky to get right and I still think that there are rare use
+cases for this, in fact, in my career I have yet to find one. I think you're better
+off trying to find a good size for your buffers or reconsider your architecture
+before you resort to this.
+
+That said, I hope it was useful, happy hacking!
