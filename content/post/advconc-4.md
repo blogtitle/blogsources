@@ -206,7 +206,7 @@ func BufLongLived[T any](in <-chan T) <-chan T {
 			case nout <- next:
 				if len(queue) == 0 {
 					nout = nil
-                    continue
+				  continue
 				}
 				next = queue[0]
 				queue = queue[1:]
@@ -238,6 +238,69 @@ func BufLongLived[T any](in <-chan T) <-chan T {
 	return out
 }
 ```
+
+# Edit(20 Dec 2024) One minor difference
+
+As [someone on reddit pointed out](https://www.reddit.com/r/golang/comments/1hifpsl/comment/m2yug67/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button),
+there is a minor but important difference between my implementation and a "real"
+infinite buffer channel: when a value is received from the source channel it's not
+immediately sent on the out one.
+
+This means that it is possible to observe a situation in which a sender has successfully
+sent a value on `in` but the receiver fails to receive it without waiting
+(e.g. with a `select` with a `default` case), which would be impossible to reproduce
+with a "real" channel.
+
+Example test to reproduce the issue:
+
+```go
+// Real Go channel
+ch := make(chan int, 1)
+
+mu := sync.Mutex{}
+mu.Lock()
+
+go func() {
+	ch <- 1
+	mu.Unlock()
+}()
+
+mu.Lock()
+// We now know for sure the value 1 is in the buffer
+mu.Unlock()
+
+select {
+case <-ch:
+// This will always be selected
+default:
+	panic("unreachable with real Go channels")
+}
+```
+
+```go
+src := make(chan int)
+// A channel built with my solution
+ch := BufLongLived(src)
+
+mu := sync.Mutex{}
+mu.Lock()
+
+go func() {
+	src <- 1
+	mu.Unlock()
+}()
+
+mu.Lock()
+mu.Unlock()
+
+// We don't know which branch we'll pick
+select {
+case <-ch:
+default:
+}
+```
+
+If your code relies on this channel guarantee, please consider using a real channel instead.
 
 # Conclusions
 
